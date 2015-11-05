@@ -13,12 +13,12 @@ namespace Tester
 
         private void btAddBookmark_Click(object sender, EventArgs e)
         {
-            fctb.Bookmarks.Add(fctb.Selection.Start.iLine);
+            fctb.Bookmarks.Add(fctb.Selection.Start.ILine);
         }
 
         private void btRemoveBookmark_Click(object sender, EventArgs e)
         {
-            fctb.Bookmarks.Remove(fctb.Selection.Start.iLine);
+            fctb.Bookmarks.Remove(fctb.Selection.Start.ILine);
         }
 
         private void btGo_DropDownOpening(object sender, EventArgs e)
@@ -28,19 +28,19 @@ namespace Tester
             {
                 var item = btGo.DropDownItems.Add(bookmark.Name);
                 item.Tag = bookmark;
-                item.Click += (o, a) => ((Bookmark)(o as ToolStripItem).Tag).DoVisible();
+                item.Click += (o, a) => ((Bookmark) (o as ToolStripItem).Tag).DoVisible();
             }
         }
 
         private void fctb_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if(e.X < fctb.LeftIndent)
+            if (e.X < fctb.LeftIndent)
             {
                 var place = fctb.PointToPlace(e.Location);
-                if(fctb.Bookmarks.Contains(place.iLine))
-                    fctb.Bookmarks.Remove(place.iLine);
+                if (fctb.Bookmarks.Contains(place.ILine))
+                    fctb.Bookmarks.Remove(place.ILine);
                 else
-                    fctb.Bookmarks.Add(place.iLine);
+                    fctb.Bookmarks.Add(place.ILine);
             }
         }
     }

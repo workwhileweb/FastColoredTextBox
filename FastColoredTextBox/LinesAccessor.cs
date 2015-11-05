@@ -1,22 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FastColoredTextBoxNS
 {
     public class LinesAccessor : IList<string>
     {
-        IList<Line> ts;
+        private readonly IList<Line> _ts;
 
         public LinesAccessor(IList<Line> ts)
         {
-            this.ts = ts;
+            _ts = ts;
         }
 
         public int IndexOf(string item)
         {
-            for (int i = 0; i < ts.Count; i++)
-                if (ts[i].Text == item)
+            for (var i = 0; i < _ts.Count; i++)
+                if (_ts[i].Text == item)
                     return i;
 
             return -1;
@@ -34,14 +34,8 @@ namespace FastColoredTextBoxNS
 
         public string this[int index]
         {
-            get
-            {
-                return ts[index].Text;
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return _ts[index].Text; }
+            set { throw new NotImplementedException(); }
         }
 
         public void Add(string item)
@@ -56,8 +50,8 @@ namespace FastColoredTextBoxNS
 
         public bool Contains(string item)
         {
-            for (int i = 0; i < ts.Count; i++)
-                if (ts[i].Text == item)
+            for (var i = 0; i < _ts.Count; i++)
+                if (_ts[i].Text == item)
                     return true;
 
             return false;
@@ -65,13 +59,13 @@ namespace FastColoredTextBoxNS
 
         public void CopyTo(string[] array, int arrayIndex)
         {
-            for (int i = 0; i < ts.Count; i++)
-                array[i + arrayIndex] = ts[i].Text;
+            for (var i = 0; i < _ts.Count; i++)
+                array[i + arrayIndex] = _ts[i].Text;
         }
 
         public int Count
         {
-            get { return ts.Count; }
+            get { return _ts.Count; }
         }
 
         public bool IsReadOnly
@@ -86,11 +80,11 @@ namespace FastColoredTextBoxNS
 
         public IEnumerator<string> GetEnumerator()
         {
-            for (int i = 0; i < ts.Count; i++)
-                yield return ts[i].Text;
+            for (var i = 0; i < _ts.Count; i++)
+                yield return _ts[i].Text;
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }

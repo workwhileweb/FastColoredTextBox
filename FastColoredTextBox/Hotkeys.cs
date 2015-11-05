@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing;
 using System.Drawing.Design;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -16,89 +12,89 @@ using KEYS = System.Windows.Forms.Keys;
 namespace FastColoredTextBoxNS
 {
     /// <summary>
-    /// Dictionary of shortcuts for FCTB
+    ///     Dictionary of shortcuts for FCTB
     /// </summary>
-    public class HotkeysMapping : SortedDictionary<Keys, FCTBAction>
+    public class HotkeysMapping : SortedDictionary<KEYS, FctbAction>
     {
         public virtual void InitDefault()
         {
-            this[KEYS.Control | KEYS.G] = FCTBAction.GoToDialog;
-            this[KEYS.Control | KEYS.F] = FCTBAction.FindDialog;
-            this[KEYS.Alt | KEYS.F] = FCTBAction.FindChar;
-            this[KEYS.F3] = FCTBAction.FindNext;
-            this[KEYS.Control | KEYS.H] = FCTBAction.ReplaceDialog;
-            this[KEYS.Control | KEYS.C] = FCTBAction.Copy;
-            this[KEYS.Control | KEYS.Shift | KEYS.C] = FCTBAction.CommentSelected;
-            this[KEYS.Control | KEYS.X] = FCTBAction.Cut;
-            this[KEYS.Control | KEYS.V] = FCTBAction.Paste;
-            this[KEYS.Control | KEYS.A] = FCTBAction.SelectAll;
-            this[KEYS.Control | KEYS.Z] = FCTBAction.Undo;
-            this[KEYS.Control | KEYS.R] = FCTBAction.Redo;
-            this[KEYS.Control | KEYS.U] = FCTBAction.UpperCase;
-            this[KEYS.Shift | KEYS.Control | KEYS.U] = FCTBAction.LowerCase;
-            this[KEYS.Control | KEYS.OemMinus] = FCTBAction.NavigateBackward;
-            this[KEYS.Control | KEYS.Shift | KEYS.OemMinus] = FCTBAction.NavigateForward;
-            this[KEYS.Control | KEYS.B] = FCTBAction.BookmarkLine;
-            this[KEYS.Control | KEYS.Shift | KEYS.B] = FCTBAction.UnbookmarkLine;
-            this[KEYS.Control | KEYS.N] = FCTBAction.GoNextBookmark;
-            this[KEYS.Control | KEYS.Shift | KEYS.N] = FCTBAction.GoPrevBookmark;
-            this[KEYS.Alt | KEYS.Back] = FCTBAction.Undo;
-            this[KEYS.Control | KEYS.Back] = FCTBAction.ClearWordLeft;
-            this[KEYS.Insert] = FCTBAction.ReplaceMode;
-            this[KEYS.Control | KEYS.Insert] = FCTBAction.Copy;
-            this[KEYS.Shift | KEYS.Insert] = FCTBAction.Paste;
-            this[KEYS.Delete] = FCTBAction.DeleteCharRight;
-            this[KEYS.Control | KEYS.Delete] = FCTBAction.ClearWordRight;
-            this[KEYS.Shift | KEYS.Delete] = FCTBAction.Cut;
-            this[KEYS.Left] = FCTBAction.GoLeft;
-            this[KEYS.Shift | KEYS.Left] = FCTBAction.GoLeftWithSelection;
-            this[KEYS.Control | KEYS.Left] = FCTBAction.GoWordLeft;
-            this[KEYS.Control | KEYS.Shift | KEYS.Left] = FCTBAction.GoWordLeftWithSelection;
-            this[KEYS.Alt | KEYS.Shift | KEYS.Left] = FCTBAction.GoLeft_ColumnSelectionMode;
-            this[KEYS.Right] = FCTBAction.GoRight;
-            this[KEYS.Shift | KEYS.Right] = FCTBAction.GoRightWithSelection;
-            this[KEYS.Control | KEYS.Right] = FCTBAction.GoWordRight;
-            this[KEYS.Control | KEYS.Shift | KEYS.Right] = FCTBAction.GoWordRightWithSelection;
-            this[KEYS.Alt | KEYS.Shift | KEYS.Right] = FCTBAction.GoRight_ColumnSelectionMode;
-            this[KEYS.Up] = FCTBAction.GoUp;
-            this[KEYS.Shift | KEYS.Up] = FCTBAction.GoUpWithSelection;
-            this[KEYS.Alt | KEYS.Shift | KEYS.Up] = FCTBAction.GoUp_ColumnSelectionMode;
-            this[KEYS.Alt | KEYS.Up] = FCTBAction.MoveSelectedLinesUp;
-            this[KEYS.Control | KEYS.Up] = FCTBAction.ScrollUp;
-            this[KEYS.Down] = FCTBAction.GoDown;
-            this[KEYS.Shift | KEYS.Down] = FCTBAction.GoDownWithSelection;
-            this[KEYS.Alt | KEYS.Shift | KEYS.Down] = FCTBAction.GoDown_ColumnSelectionMode;
-            this[KEYS.Alt | KEYS.Down] = FCTBAction.MoveSelectedLinesDown;
-            this[KEYS.Control | KEYS.Down] = FCTBAction.ScrollDown;
-            this[KEYS.PageUp] = FCTBAction.GoPageUp;
-            this[KEYS.Shift | KEYS.PageUp] = FCTBAction.GoPageUpWithSelection;
-            this[KEYS.PageDown] = FCTBAction.GoPageDown;
-            this[KEYS.Shift | KEYS.PageDown] = FCTBAction.GoPageDownWithSelection;
-            this[KEYS.Home] = FCTBAction.GoHome;
-            this[KEYS.Shift | KEYS.Home] = FCTBAction.GoHomeWithSelection;
-            this[KEYS.Control | KEYS.Home] = FCTBAction.GoFirstLine;
-            this[KEYS.Control | KEYS.Shift | KEYS.Home] = FCTBAction.GoFirstLineWithSelection;
-            this[KEYS.End] = FCTBAction.GoEnd;
-            this[KEYS.Shift | KEYS.End] = FCTBAction.GoEndWithSelection;
-            this[KEYS.Control | KEYS.End] = FCTBAction.GoLastLine;
-            this[KEYS.Control | KEYS.Shift | KEYS.End] = FCTBAction.GoLastLineWithSelection;
-            this[KEYS.Escape] = FCTBAction.ClearHints;
-            this[KEYS.Control | KEYS.M] = FCTBAction.MacroRecord;
-            this[KEYS.Control | KEYS.E] = FCTBAction.MacroExecute;
-            this[KEYS.Control | KEYS.Space] = FCTBAction.AutocompleteMenu;
-            this[KEYS.Tab] = FCTBAction.IndentIncrease;
-            this[KEYS.Shift | KEYS.Tab] = FCTBAction.IndentDecrease;
-            this[KEYS.Control | KEYS.Subtract] = FCTBAction.ZoomOut;
-            this[KEYS.Control | KEYS.Add] = FCTBAction.ZoomIn;
-            this[KEYS.Control | KEYS.D0] = FCTBAction.ZoomNormal;
-            this[KEYS.Control | KEYS.I] = FCTBAction.AutoIndentChars;   
+            this[KEYS.Control | KEYS.G] = FctbAction.GoToDialog;
+            this[KEYS.Control | KEYS.F] = FctbAction.FindDialog;
+            this[KEYS.Alt | KEYS.F] = FctbAction.FindChar;
+            this[KEYS.F3] = FctbAction.FindNext;
+            this[KEYS.Control | KEYS.H] = FctbAction.ReplaceDialog;
+            this[KEYS.Control | KEYS.C] = FctbAction.Copy;
+            this[KEYS.Control | KEYS.Shift | KEYS.C] = FctbAction.CommentSelected;
+            this[KEYS.Control | KEYS.X] = FctbAction.Cut;
+            this[KEYS.Control | KEYS.V] = FctbAction.Paste;
+            this[KEYS.Control | KEYS.A] = FctbAction.SelectAll;
+            this[KEYS.Control | KEYS.Z] = FctbAction.Undo;
+            this[KEYS.Control | KEYS.R] = FctbAction.Redo;
+            this[KEYS.Control | KEYS.U] = FctbAction.UpperCase;
+            this[KEYS.Shift | KEYS.Control | KEYS.U] = FctbAction.LowerCase;
+            this[KEYS.Control | KEYS.OemMinus] = FctbAction.NavigateBackward;
+            this[KEYS.Control | KEYS.Shift | KEYS.OemMinus] = FctbAction.NavigateForward;
+            this[KEYS.Control | KEYS.B] = FctbAction.BookmarkLine;
+            this[KEYS.Control | KEYS.Shift | KEYS.B] = FctbAction.UnbookmarkLine;
+            this[KEYS.Control | KEYS.N] = FctbAction.GoNextBookmark;
+            this[KEYS.Control | KEYS.Shift | KEYS.N] = FctbAction.GoPrevBookmark;
+            this[KEYS.Alt | KEYS.Back] = FctbAction.Undo;
+            this[KEYS.Control | KEYS.Back] = FctbAction.ClearWordLeft;
+            this[KEYS.Insert] = FctbAction.ReplaceMode;
+            this[KEYS.Control | KEYS.Insert] = FctbAction.Copy;
+            this[KEYS.Shift | KEYS.Insert] = FctbAction.Paste;
+            this[KEYS.Delete] = FctbAction.DeleteCharRight;
+            this[KEYS.Control | KEYS.Delete] = FctbAction.ClearWordRight;
+            this[KEYS.Shift | KEYS.Delete] = FctbAction.Cut;
+            this[KEYS.Left] = FctbAction.GoLeft;
+            this[KEYS.Shift | KEYS.Left] = FctbAction.GoLeftWithSelection;
+            this[KEYS.Control | KEYS.Left] = FctbAction.GoWordLeft;
+            this[KEYS.Control | KEYS.Shift | KEYS.Left] = FctbAction.GoWordLeftWithSelection;
+            this[KEYS.Alt | KEYS.Shift | KEYS.Left] = FctbAction.GoLeftColumnSelectionMode;
+            this[KEYS.Right] = FctbAction.GoRight;
+            this[KEYS.Shift | KEYS.Right] = FctbAction.GoRightWithSelection;
+            this[KEYS.Control | KEYS.Right] = FctbAction.GoWordRight;
+            this[KEYS.Control | KEYS.Shift | KEYS.Right] = FctbAction.GoWordRightWithSelection;
+            this[KEYS.Alt | KEYS.Shift | KEYS.Right] = FctbAction.GoRightColumnSelectionMode;
+            this[KEYS.Up] = FctbAction.GoUp;
+            this[KEYS.Shift | KEYS.Up] = FctbAction.GoUpWithSelection;
+            this[KEYS.Alt | KEYS.Shift | KEYS.Up] = FctbAction.GoUpColumnSelectionMode;
+            this[KEYS.Alt | KEYS.Up] = FctbAction.MoveSelectedLinesUp;
+            this[KEYS.Control | KEYS.Up] = FctbAction.ScrollUp;
+            this[KEYS.Down] = FctbAction.GoDown;
+            this[KEYS.Shift | KEYS.Down] = FctbAction.GoDownWithSelection;
+            this[KEYS.Alt | KEYS.Shift | KEYS.Down] = FctbAction.GoDownColumnSelectionMode;
+            this[KEYS.Alt | KEYS.Down] = FctbAction.MoveSelectedLinesDown;
+            this[KEYS.Control | KEYS.Down] = FctbAction.ScrollDown;
+            this[KEYS.PageUp] = FctbAction.GoPageUp;
+            this[KEYS.Shift | KEYS.PageUp] = FctbAction.GoPageUpWithSelection;
+            this[KEYS.PageDown] = FctbAction.GoPageDown;
+            this[KEYS.Shift | KEYS.PageDown] = FctbAction.GoPageDownWithSelection;
+            this[KEYS.Home] = FctbAction.GoHome;
+            this[KEYS.Shift | KEYS.Home] = FctbAction.GoHomeWithSelection;
+            this[KEYS.Control | KEYS.Home] = FctbAction.GoFirstLine;
+            this[KEYS.Control | KEYS.Shift | KEYS.Home] = FctbAction.GoFirstLineWithSelection;
+            this[KEYS.End] = FctbAction.GoEnd;
+            this[KEYS.Shift | KEYS.End] = FctbAction.GoEndWithSelection;
+            this[KEYS.Control | KEYS.End] = FctbAction.GoLastLine;
+            this[KEYS.Control | KEYS.Shift | KEYS.End] = FctbAction.GoLastLineWithSelection;
+            this[KEYS.Escape] = FctbAction.ClearHints;
+            this[KEYS.Control | KEYS.M] = FctbAction.MacroRecord;
+            this[KEYS.Control | KEYS.E] = FctbAction.MacroExecute;
+            this[KEYS.Control | KEYS.Space] = FctbAction.AutocompleteMenu;
+            this[KEYS.Tab] = FctbAction.IndentIncrease;
+            this[KEYS.Shift | KEYS.Tab] = FctbAction.IndentDecrease;
+            this[KEYS.Control | KEYS.Subtract] = FctbAction.ZoomOut;
+            this[KEYS.Control | KEYS.Add] = FctbAction.ZoomIn;
+            this[KEYS.Control | KEYS.D0] = FctbAction.ZoomNormal;
+            this[KEYS.Control | KEYS.I] = FctbAction.AutoIndentChars;
         }
 
         public override string ToString()
         {
             var cult = Thread.CurrentThread.CurrentUICulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             var kc = new KeysConverter();
             foreach (var pair in this)
             {
@@ -120,12 +116,12 @@ namespace FastColoredTextBoxNS
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             var kc = new KeysConverter();
-            
+
             foreach (var p in s.Split(','))
             {
                 var pp = p.Split('=');
-                var k = (Keys)kc.ConvertFromString(pp[0].Trim());
-                var a = (FCTBAction)Enum.Parse(typeof(FCTBAction), pp[1].Trim());
+                var k = (Keys) kc.ConvertFromString(pp[0].Trim());
+                var a = (FctbAction) Enum.Parse(typeof (FctbAction), pp[1].Trim());
                 result[k] = a;
             }
 
@@ -136,9 +132,9 @@ namespace FastColoredTextBoxNS
     }
 
     /// <summary>
-    /// Actions for shortcuts
+    ///     Actions for shortcuts
     /// </summary>
-    public enum FCTBAction
+    public enum FctbAction
     {
         None,
         AutocompleteMenu,
@@ -156,7 +152,7 @@ namespace FastColoredTextBoxNS
         FindNext,
         GoDown,
         GoDownWithSelection,
-        GoDown_ColumnSelectionMode,
+        GoDownColumnSelectionMode,
         GoEnd,
         GoEndWithSelection,
         GoFirstLine,
@@ -167,20 +163,20 @@ namespace FastColoredTextBoxNS
         GoLastLineWithSelection,
         GoLeft,
         GoLeftWithSelection,
-        GoLeft_ColumnSelectionMode,
+        GoLeftColumnSelectionMode,
         GoPageDown,
         GoPageDownWithSelection,
         GoPageUp,
         GoPageUpWithSelection,
         GoRight,
         GoRightWithSelection,
-        GoRight_ColumnSelectionMode,
+        GoRightColumnSelectionMode,
         GoToDialog,
         GoNextBookmark,
         GoPrevBookmark,
         GoUp,
         GoUpWithSelection,
-        GoUp_ColumnSelectionMode,
+        GoUpColumnSelectionMode,
         GoWordLeft,
         GoWordLeftWithSelection,
         GoWordRight,
@@ -231,14 +227,15 @@ namespace FastColoredTextBoxNS
 
     internal class HotkeysEditor : UITypeEditor
     {
-        public override UITypeEditorEditStyle GetEditStyle(System.ComponentModel.ITypeDescriptorContext context)
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
             return UITypeEditorEditStyle.Modal;
         }
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if ((provider != null) && (((IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService))) != null))
+            if ((provider != null) &&
+                (((IWindowsFormsEditorService) provider.GetService(typeof (IWindowsFormsEditorService))) != null))
             {
                 var form = new HotkeysEditorForm(HotkeysMapping.Parse(value as string));
 

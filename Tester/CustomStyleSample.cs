@@ -1,14 +1,14 @@
 ﻿using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
-using System.Text.RegularExpressions;
 
 namespace Tester
 {
     public partial class CustomStyleSample : Form
     {
         //create my custom style
-        EllipseStyle ellipseStyle = new EllipseStyle();
+        private readonly EllipseStyle _ellipseStyle = new EllipseStyle();
 
         public CustomStyleSample()
         {
@@ -18,23 +18,23 @@ namespace Tester
         private void fctb_TextChanged(object sender, TextChangedEventArgs e)
         {
             //clear old styles of chars
-            e.ChangedRange.ClearStyle(ellipseStyle);
+            e.ChangedRange.ClearStyle(_ellipseStyle);
             //append style for word 'Babylon'
-            e.ChangedRange.SetStyle(ellipseStyle, @"\bBabylon\b", RegexOptions.IgnoreCase);
+            e.ChangedRange.SetStyle(_ellipseStyle, @"\bBabylon\b", RegexOptions.IgnoreCase);
         }
     }
 
     /// <summary>
-    /// This style will drawing ellipse around of the word
+    ///     This style will drawing ellipse around of the word
     /// </summary>
-    class EllipseStyle : Style
+    internal class EllipseStyle : Style
     {
         public override void Draw(Graphics gr, Point position, Range range)
         {
             //get size of rectangle
-            Size size = GetSizeOfRange(range);
+            var size = GetSizeOfRange(range);
             //create rectangle
-            Rectangle rect = new Rectangle(position, size);
+            var rect = new Rectangle(position, size);
             //inflate it
             rect.Inflate(2, 2);
             //get rounded rectangle

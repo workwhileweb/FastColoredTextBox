@@ -3,102 +3,98 @@
 namespace FastColoredTextBoxNS
 {
     /// <summary>
-    /// Limited stack
+    ///     Limited stack
     /// </summary>
     public class LimitedStack<T>
     {
-        T[] items;
-        int count;
-        int start;
+        private T[] _items;
+        private int _start;
 
         /// <summary>
-        /// Max stack length
-        /// </summary>
-        public int MaxItemCount
-        {
-            get { return items.Length; }
-        }
-
-        /// <summary>
-        /// Current length of stack
-        /// </summary>
-        public int Count
-        {
-            get { return count; }
-        }
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="maxItemCount">Maximum length of stack</param>
         public LimitedStack(int maxItemCount)
         {
-            items = new T[maxItemCount];
-            count = 0;
-            start = 0;
+            _items = new T[maxItemCount];
+            Count = 0;
+            _start = 0;
         }
 
         /// <summary>
-        /// Pop item
+        ///     Max stack length
+        /// </summary>
+        public int MaxItemCount
+        {
+            get { return _items.Length; }
+        }
+
+        /// <summary>
+        ///     Current length of stack
+        /// </summary>
+        public int Count { get; private set; }
+
+        private int LastIndex
+        {
+            get { return (_start + Count - 1)%_items.Length; }
+        }
+
+        /// <summary>
+        ///     Pop item
         /// </summary>
         public T Pop()
         {
-            if (count == 0)
+            if (Count == 0)
                 throw new Exception("Stack is empty");
 
-            int i = LastIndex;
-            T item = items[i];
-            items[i] = default(T);
+            var i = LastIndex;
+            var item = _items[i];
+            _items[i] = default(T);
 
-            count--;
+            Count--;
 
             return item;
         }
 
-        int LastIndex
-        {
-            get { return (start + count - 1) % items.Length; }
-        }
-
         /// <summary>
-        /// Peek item
+        ///     Peek item
         /// </summary>
         public T Peek()
         {
-            if (count == 0)
+            if (Count == 0)
                 return default(T);
 
-            return items[LastIndex];
+            return _items[LastIndex];
         }
 
         /// <summary>
-        /// Push item
+        ///     Push item
         /// </summary>
         public void Push(T item)
         {
-            if (count == items.Length)
-                start = (start + 1) % items.Length;
+            if (Count == _items.Length)
+                _start = (_start + 1)%_items.Length;
             else
-                count++;
+                Count++;
 
-            items[LastIndex] = item;
+            _items[LastIndex] = item;
         }
 
         /// <summary>
-        /// Clear stack
+        ///     Clear stack
         /// </summary>
         public void Clear()
         {
-            items = new T[items.Length];
-            count = 0;
-            start = 0;
+            _items = new T[_items.Length];
+            Count = 0;
+            _start = 0;
         }
 
         public T[] ToArray()
         {
-            T[] result = new T[count];
-            for (int i = 0; i < count; i++)
-                result[i] = items[(start + i) % items.Length];
+            var result = new T[Count];
+            for (var i = 0; i < Count; i++)
+                result[i] = _items[(_start + i)%_items.Length];
             return result;
         }
     }

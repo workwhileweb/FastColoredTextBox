@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
@@ -8,7 +7,7 @@ namespace Tester
     public partial class SimplestSyntaxHighlightingSample : Form
     {
         //Create style for highlighting
-        TextStyle brownStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
+        private readonly TextStyle _brownStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
 
         public SimplestSyntaxHighlightingSample()
         {
@@ -18,9 +17,9 @@ namespace Tester
         private void fctb_TextChanged(object sender, TextChangedEventArgs e)
         {
             //clear previous highlighting
-            e.ChangedRange.ClearStyle(brownStyle);
+            e.ChangedRange.ClearStyle(_brownStyle);
             //highlight tags
-            e.ChangedRange.SetStyle(brownStyle, "<[^>]+>");
+            e.ChangedRange.SetStyle(_brownStyle, "<[^>]+>");
         }
     }
 }

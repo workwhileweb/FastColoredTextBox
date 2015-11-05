@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace FastColoredTextBoxNS
 {
     public partial class ReplaceForm : Form
     {
-        FastColoredTextBox tb;
-        bool firstSearch = true;
-        Place startPlace;
+        private bool _firstSearch = true;
+        private Place _startPlace;
+        private readonly FastColoredTextBox _tb;
 
         public ReplaceForm(FastColoredTextBox tb)
         {
             InitializeComponent();
-            this.tb = tb;
+            _tb = tb;
         }
 
         private void btClose_Click(object sender, EventArgs e)
@@ -43,7 +43,7 @@ namespace FastColoredTextBoxNS
             if (cbWholeWord.Checked)
                 pattern = "\\b" + pattern + "\\b";
             //
-            var range = tb.Selection.IsEmpty? tb.Range.Clone() : tb.Selection.Clone();
+            var range = _tb.Selection.IsEmpty ? _tb.Range.Clone() : _tb.Selection.Clone();
             //
             var list = new List<Range>();
             foreach (var r in range.GetRangesByLines(pattern, opt))
@@ -54,38 +54,38 @@ namespace FastColoredTextBoxNS
 
         public bool Find(string pattern)
         {
-            RegexOptions opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
+            var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
             if (!cbRegex.Checked)
                 pattern = Regex.Escape(pattern);
             if (cbWholeWord.Checked)
                 pattern = "\\b" + pattern + "\\b";
             //
-            Range range = tb.Selection.Clone();
+            var range = _tb.Selection.Clone();
             range.Normalize();
             //
-            if (firstSearch)
+            if (_firstSearch)
             {
-                startPlace = range.Start;
-                firstSearch = false;
+                _startPlace = range.Start;
+                _firstSearch = false;
             }
             //
             range.Start = range.End;
-            if (range.Start >= startPlace)
-                range.End = new Place(tb.GetLineLength(tb.LinesCount - 1), tb.LinesCount - 1);
+            if (range.Start >= _startPlace)
+                range.End = new Place(_tb.GetLineLength(_tb.LinesCount - 1), _tb.LinesCount - 1);
             else
-                range.End = startPlace;
+                range.End = _startPlace;
             //
             foreach (var r in range.GetRangesByLines(pattern, opt))
             {
-                tb.Selection.Start = r.Start;
-                tb.Selection.End = r.End;
-                tb.DoSelectionVisible();
-                tb.Invalidate();
+                _tb.Selection.Start = r.Start;
+                _tb.Selection.End = r.End;
+                _tb.DoSelectionVisible();
+                _tb.Invalidate();
                 return true;
             }
-            if (range.Start >= startPlace && startPlace > Place.Empty)
+            if (range.Start >= _startPlace && _startPlace > Place.Empty)
             {
-                tb.Selection.Start = new Place(0, 0);
+                _tb.Selection.Start = new Place(0, 0);
                 return Find(pattern);
             }
             return false;
@@ -103,7 +103,7 @@ namespace FastColoredTextBoxNS
         {
             if (keyData == Keys.Escape)
             {
-                this.Close();
+                Close();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -116,16 +116,16 @@ namespace FastColoredTextBoxNS
                 e.Cancel = true;
                 Hide();
             }
-            this.tb.Focus();
+            _tb.Focus();
         }
 
         private void btReplace_Click(object sender, EventArgs e)
         {
             try
             {
-                if (tb.SelectionLength != 0)
-                if (!tb.Selection.ReadOnly)
-                    tb.InsertText(tbReplace.Text);
+                if (_tb.SelectionLength != 0)
+                    if (!_tb.Selection.ReadOnly)
+                        _tb.InsertText(tbReplace.Text);
                 btFindNext_Click(sender, null);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace FastColoredTextBoxNS
         {
             try
             {
-                tb.Selection.BeginUpdate();
+                _tb.Selection.BeginUpdate();
 
                 //search
                 var ranges = FindAll(tbFind.Text);
@@ -152,20 +152,21 @@ namespace FastColoredTextBoxNS
                     }
                 //replace
                 if (!ro)
-                if (ranges.Count > 0)
-                {
-                    tb.TextSource.Manager.ExecuteCommand(new ReplaceTextCommand(tb.TextSource, ranges, tbReplace.Text));
-                    tb.Selection.Start = new Place(0, 0);
-                }
+                    if (ranges.Count > 0)
+                    {
+                        _tb.TextSource.Manager.ExecuteCommand(new ReplaceTextCommand(_tb.TextSource, ranges,
+                            tbReplace.Text));
+                        _tb.Selection.Start = new Place(0, 0);
+                    }
                 //
-                tb.Invalidate();
+                _tb.Invalidate();
                 MessageBox.Show(ranges.Count + " occurrence(s) replaced");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            tb.Selection.EndUpdate();
+            _tb.Selection.EndUpdate();
         }
 
         protected override void OnActivated(EventArgs e)
@@ -174,9 +175,9 @@ namespace FastColoredTextBoxNS
             ResetSerach();
         }
 
-        void ResetSerach()
+        private void ResetSerach()
         {
-            firstSearch = true;
+            _firstSearch = true;
         }
 
         private void cbMatchCase_CheckedChanged(object sender, EventArgs e)

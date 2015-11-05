@@ -18,19 +18,27 @@ namespace Tester
 
         private void GenerateText()
         {
-            Random rnd = new Random();
+            var rnd = new Random();
 
             fctb.BeginUpdate();
             fctb.Selection.BeginUpdate();
 
-            for (int i = 0; i < 50000; i++)
+            for (var i = 0; i < 50000; i++)
             {
                 switch (rnd.Next(4))
                 {
-                    case 0: fctb.AppendText("This is simple text "); break;
-                    case 1: fctb.AppendText("Some link", new BlockDesc() { URL = "http://google.com?q=" + i }); break;
-                    case 2: fctb.AppendText("TooltipedText ", new BlockDesc() { IsBold = true, ToolTip = "ToolTip " + i }); break;
-                    case 3: fctb.NewLine(); break;
+                    case 0:
+                        fctb.AppendText("This is simple text ");
+                        break;
+                    case 1:
+                        fctb.AppendText("Some link", new BlockDesc {Url = "http://google.com?q=" + i});
+                        break;
+                    case 2:
+                        fctb.AppendText("TooltipedText ", new BlockDesc {IsBold = true, ToolTip = "ToolTip " + i});
+                        break;
+                    case 3:
+                        fctb.NewLine();
+                        break;
                 }
             }
 
@@ -39,18 +47,18 @@ namespace Tester
         }
     }
 
-    internal class ReadOnlyFCTB : FastColoredTextBox
+    internal class ReadOnlyFctb : FastColoredTextBox
     {
-        TextStyle linkStyle = new TextStyle(Brushes.Blue, null, FontStyle.Underline);
-        TextStyle visitedLinkStyle = new TextStyle(Brushes.Brown, null, FontStyle.Underline);
-        TextStyle boldStyle = new TextStyle(Brushes.Navy, null, FontStyle.Bold);
-        List<BlockDesc> blockDescs = new List<BlockDesc>();
+        private readonly Place _emptyPlace = new Place(-1, -1);
+        private readonly List<BlockDesc> _blockDescs = new List<BlockDesc>();
+        private readonly TextStyle _boldStyle = new TextStyle(Brushes.Navy, null, FontStyle.Bold);
 
-        Point lastMouseCoord;
-        Place lastPlace;
-        readonly Place emptyPlace = new Place(-1, -1);
+        private Point _lastMouseCoord;
+        private Place _lastPlace;
+        private readonly TextStyle _linkStyle = new TextStyle(Brushes.Blue, null, FontStyle.Underline);
+        private readonly TextStyle _visitedLinkStyle = new TextStyle(Brushes.Brown, null, FontStyle.Underline);
 
-        public ReadOnlyFCTB()
+        public ReadOnlyFctb()
         {
             ReadOnly = true;
         }
@@ -65,50 +73,49 @@ namespace Tester
             var oldPlace = new Place(GetLineLength(LinesCount - 1), LinesCount - 1);
 
             if (desc.IsBold)
-                AppendText(text, boldStyle);
+                AppendText(text, _boldStyle);
+            else if (!string.IsNullOrEmpty(desc.Url))
+                AppendText(text, _linkStyle);
             else
-                if (!string.IsNullOrEmpty(desc.URL))
-                    AppendText(text, linkStyle);
-                else
-                    AppendText(text);
+                AppendText(text);
 
             //if descriptor contains some additional data ...
-            if (!string.IsNullOrEmpty(desc.URL) || !string.IsNullOrEmpty(desc.ToolTip))
+            if (!string.IsNullOrEmpty(desc.Url) || !string.IsNullOrEmpty(desc.ToolTip))
             {
                 //save descriptor in sorted list
                 desc.Start = oldPlace;
                 desc.End = new Place(GetLineLength(LinesCount - 1), LinesCount - 1);
-                blockDescs.Add(desc);
+                _blockDescs.Add(desc);
             }
         }
 
-        BlockDesc GetDesc(Place place)
+        private BlockDesc GetDesc(Place place)
         {
-            var index = blockDescs.BinarySearch(new BlockDesc() { Start = place, End = place });
+            var index = _blockDescs.BinarySearch(new BlockDesc {Start = place, End = place});
             if (index >= 0)
-                return blockDescs[index];
+                return _blockDescs[index];
 
             return null;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            lastMouseCoord = e.Location;
+            _lastMouseCoord = e.Location;
             Cursor = Cursors.IBeam;
 
             //get place under mouse
-            lastPlace = PointToPlace(lastMouseCoord);
+            _lastPlace = PointToPlace(_lastMouseCoord);
 
             //check distance
-            var p = PlaceToPoint(lastPlace);
-            if (Math.Abs(p.X - lastMouseCoord.X) > CharWidth * 2 || Math.Abs(p.Y - lastMouseCoord.Y) > CharHeight * 2)
-                lastPlace = emptyPlace;
+            var p = PlaceToPoint(_lastPlace);
+            if (Math.Abs(p.X - _lastMouseCoord.X) > CharWidth*2 || Math.Abs(p.Y - _lastMouseCoord.Y) > CharHeight*2)
+                _lastPlace = _emptyPlace;
 
             //check link style
-            if (lastPlace != emptyPlace)
+            if (_lastPlace != _emptyPlace)
             {
-                var styles = GetStylesOfChar(lastPlace);
-                if (styles.Contains(linkStyle) || styles.Contains(visitedLinkStyle))
+                var styles = GetStylesOfChar(_lastPlace);
+                if (styles.Contains(_linkStyle) || styles.Contains(_visitedLinkStyle))
                     Cursor = Cursors.Hand;
             }
 
@@ -117,13 +124,13 @@ namespace Tester
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            var desc = GetDesc(lastPlace);
-            if (desc != null && !string.IsNullOrEmpty(desc.URL))
+            var desc = GetDesc(_lastPlace);
+            if (desc != null && !string.IsNullOrEmpty(desc.Url))
             {
                 var r = new Range(this, desc.Start, desc.End);
-                r.ClearStyle(linkStyle);
-                r.SetStyle(visitedLinkStyle);
-                BeginInvoke(new MethodInvoker(() => Process.Start(desc.URL)));
+                r.ClearStyle(_linkStyle);
+                r.SetStyle(_visitedLinkStyle);
+                BeginInvoke(new MethodInvoker(() => Process.Start(desc.Url)));
             }
 
             base.OnMouseDown(e);
@@ -135,26 +142,26 @@ namespace Tester
                 return;
 
             //get descriptor for place
-            var desc = GetDesc(lastPlace);
+            var desc = GetDesc(_lastPlace);
 
             //show tooltip
             if (desc != null)
             {
-                var toolTip = desc.ToolTip ?? desc.URL;
+                var toolTip = desc.ToolTip ?? desc.Url;
                 ToolTip.SetToolTip(this, toolTip);
-                ToolTip.Show(toolTip, this, new Point(lastMouseCoord.X, lastMouseCoord.Y + CharHeight));
+                ToolTip.Show(toolTip, this, new Point(_lastMouseCoord.X, _lastMouseCoord.Y + CharHeight));
             }
         }
     }
 
     public class BlockDesc : IComparable<BlockDesc>
     {
+        internal Place End;
         public bool IsBold;
-        public string ToolTip;
-        public string URL;
 
         internal Place Start;
-        internal Place End;
+        public string ToolTip;
+        public string Url;
 
         public int CompareTo(BlockDesc other)
         {

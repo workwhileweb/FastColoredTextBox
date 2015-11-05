@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using FastColoredTextBoxNS;
+﻿using System.Windows.Forms;
 
 namespace Tester
 {
@@ -8,7 +6,7 @@ namespace Tester
     {
         public MacrosSample()
         {
-            InitializeComponent();   
+            InitializeComponent();
         }
     }
 }

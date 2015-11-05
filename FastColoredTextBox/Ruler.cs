@@ -1,48 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Drawing.Drawing2D;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FastColoredTextBoxNS
 {
     public partial class Ruler : UserControl
     {
+        private FastColoredTextBox _target;
         public EventHandler TargetChanged;
-
-        [DefaultValue(typeof(Color), "ControlLight")]
-        public Color BackColor2 { get; set; }
-
-        [DefaultValue(typeof(Color), "DarkGray")]
-        public Color TickColor { get; set; }
-
-        [DefaultValue(typeof(Color), "Black")]
-        public Color CaretTickColor { get; set; }
-
-        FastColoredTextBox target;
-
-        [Description("Target FastColoredTextBox")]
-        public FastColoredTextBox Target
-        {
-            get { return target; }
-            set
-            {
-                if (target != null)
-                    UnSubscribe(target);
-                target = value;
-                Subscribe(target);
-                OnTargetChanged();
-            }
-        }
 
         public Ruler()
         {
             InitializeComponent();
 
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
+            SetStyle(
+                ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
             MinimumSize = new Size(0, 24);
             MaximumSize = new Size(int.MaxValue/2, 24);
 
@@ -51,6 +25,28 @@ namespace FastColoredTextBoxNS
             CaretTickColor = Color.Black;
         }
 
+        [DefaultValue(typeof (Color), "ControlLight")]
+        public Color BackColor2 { get; set; }
+
+        [DefaultValue(typeof (Color), "DarkGray")]
+        public Color TickColor { get; set; }
+
+        [DefaultValue(typeof (Color), "Black")]
+        public Color CaretTickColor { get; set; }
+
+        [Description("Target FastColoredTextBox")]
+        public FastColoredTextBox Target
+        {
+            get { return _target; }
+            set
+            {
+                if (_target != null)
+                    UnSubscribe(_target);
+                _target = value;
+                Subscribe(_target);
+                OnTargetChanged();
+            }
+        }
 
 
         protected virtual void OnTargetChanged()
@@ -61,24 +57,24 @@ namespace FastColoredTextBoxNS
 
         protected virtual void UnSubscribe(FastColoredTextBox target)
         {
-            target.Scroll -= new ScrollEventHandler(target_Scroll);
-            target.SelectionChanged -= new EventHandler(target_SelectionChanged);
-            target.VisibleRangeChanged -= new EventHandler(target_VisibleRangeChanged);
+            target.Scroll -= target_Scroll;
+            target.SelectionChanged -= target_SelectionChanged;
+            target.VisibleRangeChanged -= target_VisibleRangeChanged;
         }
 
         protected virtual void Subscribe(FastColoredTextBox target)
         {
-            target.Scroll += new ScrollEventHandler(target_Scroll);
-            target.SelectionChanged += new EventHandler(target_SelectionChanged);
-            target.VisibleRangeChanged += new EventHandler(target_VisibleRangeChanged);
+            target.Scroll += target_Scroll;
+            target.SelectionChanged += target_SelectionChanged;
+            target.VisibleRangeChanged += target_VisibleRangeChanged;
         }
 
-        void target_VisibleRangeChanged(object sender, EventArgs e)
+        private void target_VisibleRangeChanged(object sender, EventArgs e)
         {
             Invalidate();
         }
 
-        void target_SelectionChanged(object sender, EventArgs e)
+        private void target_SelectionChanged(object sender, EventArgs e)
         {
             Invalidate();
         }
@@ -96,33 +92,35 @@ namespace FastColoredTextBoxNS
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (target == null)
+            if (_target == null)
                 return;
 
-            Point car = PointToClient(target.PointToScreen(target.PlaceToPoint(target.Selection.Start)));
+            var car = PointToClient(_target.PointToScreen(_target.PlaceToPoint(_target.Selection.Start)));
 
-            Size fontSize = TextRenderer.MeasureText("W", Font);
+            var fontSize = TextRenderer.MeasureText("W", Font);
 
-            int column = 0;
-            e.Graphics.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, Width, Height), BackColor, BackColor2, 270), new Rectangle(0, 0, Width, Height));
+            var column = 0;
+            e.Graphics.FillRectangle(
+                new LinearGradientBrush(new Rectangle(0, 0, Width, Height), BackColor, BackColor2, 270),
+                new Rectangle(0, 0, Width, Height));
 
-            float columnWidth = target.CharWidth;
+            float columnWidth = _target.CharWidth;
             var sf = new StringFormat();
             sf.Alignment = StringAlignment.Center;
             sf.LineAlignment = StringAlignment.Near;
 
-            var zeroPoint = target.PositionToPoint(0);
-            zeroPoint = PointToClient(target.PointToScreen(zeroPoint));
+            var zeroPoint = _target.PositionToPoint(0);
+            zeroPoint = PointToClient(_target.PointToScreen(zeroPoint));
 
             using (var pen = new Pen(TickColor))
             using (var textBrush = new SolidBrush(ForeColor))
-            for (float x = zeroPoint.X; x < Right; x += columnWidth, ++column)
-            {
-                if (column % 10 == 0)
-                    e.Graphics.DrawString(column.ToString(), Font, textBrush, x, 0f, sf);
+                for (float x = zeroPoint.X; x < Right; x += columnWidth, ++column)
+                {
+                    if (column%10 == 0)
+                        e.Graphics.DrawString(column.ToString(), Font, textBrush, x, 0f, sf);
 
-                e.Graphics.DrawLine(pen, (int)x, fontSize.Height + (column % 5 == 0 ? 1 : 3), (int)x, Height - 4);
-            }
+                    e.Graphics.DrawLine(pen, (int) x, fontSize.Height + (column%5 == 0 ? 1 : 3), (int) x, Height - 4);
+                }
 
             using (var pen = new Pen(TickColor))
                 e.Graphics.DrawLine(pen, new Point(car.X - 3, Height - 3), new Point(car.X + 3, Height - 3));

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
-using System.Drawing.Drawing2D;
 
 namespace Tester
 {
     public partial class MarkerToolSample : Form
     {
+        private readonly MarkerStyle _greenStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Green)));
+        private readonly MarkerStyle _redStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Red)));
         //Shortcut style
-        ShortcutStyle shortCutStyle = new ShortcutStyle(Pens.Maroon);
+        private readonly ShortcutStyle _shortCutStyle = new ShortcutStyle(Pens.Maroon);
         //Marker styles
-        MarkerStyle YellowStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Yellow)));
-        MarkerStyle RedStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Red)));
-        MarkerStyle GreenStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Green)));
+        private readonly MarkerStyle _yellowStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(180, Color.Yellow)));
 
         public MarkerToolSample()
         {
@@ -21,28 +21,28 @@ namespace Tester
             //
             BuildBackBrush();
             //add style explicitly to control for define priority of style drawing
-            fctb.AddStyle(YellowStyle);//render first
-            fctb.AddStyle(RedStyle);//red will be rendering over yellow
-            fctb.AddStyle(GreenStyle);//green will be rendering over yellow and red
-            fctb.AddStyle(shortCutStyle);//render last, over all other styles
+            fctb.AddStyle(_yellowStyle); //render first
+            fctb.AddStyle(_redStyle); //red will be rendering over yellow
+            fctb.AddStyle(_greenStyle); //green will be rendering over yellow and red
+            fctb.AddStyle(_shortCutStyle); //render last, over all other styles
         }
 
         private void fctb_SelectionChangedDelayed(object sender, EventArgs e)
         {
             //here we draw shortcut for selection area
-            Range selection = fctb.Selection;
+            var selection = fctb.Selection;
             //clear previous shortcuts
-            fctb.VisibleRange.ClearStyle(shortCutStyle);
+            fctb.VisibleRange.ClearStyle(_shortCutStyle);
             //create shortcuts
-            if (!selection.IsEmpty)//user selected one or more chars?
+            if (!selection.IsEmpty) //user selected one or more chars?
             {
                 //find last char
                 var r = selection.Clone();
                 r.Normalize();
-                r.Start = r.End;//go to last char
-                r.GoLeft(true);//select last char
+                r.Start = r.End; //go to last char
+                r.GoLeft(true); //select last char
                 //apply ShortCutStyle
-                r.SetStyle(shortCutStyle);
+                r.SetStyle(_shortCutStyle);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Tester
         private void fctb_VisualMarkerClick(object sender, VisualMarkerEventArgs e)
         {
             //is it our style ?
-            if (e.Style == shortCutStyle)
+            if (e.Style == _shortCutStyle)
             {
                 //show popup menu
                 cmMark.Show(fctb.PointToScreen(e.Location));
@@ -61,15 +61,23 @@ namespace Tester
         {
             TrimSelection();
             //set background style
-            switch((string)((sender as ToolStripMenuItem).Tag))
+            switch ((string) ((sender as ToolStripMenuItem).Tag))
             {
-                case "yellow": fctb.Selection.SetStyle(YellowStyle); break;
-                case "red": fctb.Selection.SetStyle(RedStyle); break;
-                case "green": fctb.Selection.SetStyle(GreenStyle); break;
-                case "lineBackground": fctb[fctb.Selection.Start.iLine].BackgroundBrush = Brushes.Pink; break;
+                case "yellow":
+                    fctb.Selection.SetStyle(_yellowStyle);
+                    break;
+                case "red":
+                    fctb.Selection.SetStyle(_redStyle);
+                    break;
+                case "green":
+                    fctb.Selection.SetStyle(_greenStyle);
+                    break;
+                case "lineBackground":
+                    fctb[fctb.Selection.Start.ILine].BackgroundBrush = Brushes.Pink;
+                    break;
             }
             //clear shortcut style
-            fctb.Selection.ClearStyle(shortCutStyle);
+            fctb.Selection.ClearStyle(_shortCutStyle);
         }
 
         private void TrimSelection()
@@ -88,15 +96,17 @@ namespace Tester
 
         private void clearMarkedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            fctb.Selection.ClearStyle(YellowStyle, RedStyle, GreenStyle);
-            fctb[fctb.Selection.Start.iLine].BackgroundBrush = null;
+            fctb.Selection.ClearStyle(_yellowStyle, _redStyle, _greenStyle);
+            fctb[fctb.Selection.Start.ILine].BackgroundBrush = null;
         }
 
         private void fctb_PaintLine(object sender, PaintLineEventArgs e)
         {
             //draw current line marker
-            if (e.LineIndex == fctb.Selection.Start.iLine)
-                using (var brush = new LinearGradientBrush(new Rectangle(0, e.LineRect.Top, 15, 15), Color.LightPink, Color.Red, 45))
+            if (e.LineIndex == fctb.Selection.Start.ILine)
+                using (
+                    var brush = new LinearGradientBrush(new Rectangle(0, e.LineRect.Top, 15, 15), Color.LightPink,
+                        Color.Red, 45))
                     e.Graphics.FillEllipse(brush, 0, e.LineRect.Top, 15, 15);
         }
 
@@ -108,7 +118,7 @@ namespace Tester
         private void BuildBackBrush()
         {
             fctb.BackBrush = new LinearGradientBrush(fctb.ClientRectangle, Color.White, Color.Silver,
-                                                     LinearGradientMode.Vertical);
+                LinearGradientMode.Vertical);
         }
     }
 }

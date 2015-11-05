@@ -1,6 +1,6 @@
 ﻿namespace Tester
 {
-    partial class IMEsample
+    partial class ImEsample
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IMEsample));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImEsample));
             this.label1 = new System.Windows.Forms.Label();
             this.fctb = new FastColoredTextBoxNS.FastColoredTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.fctb)).BeginInit();
@@ -78,7 +78,7 @@
             this.ClientSize = new System.Drawing.Size(417, 302);
             this.Controls.Add(this.fctb);
             this.Controls.Add(this.label1);
-            this.Name = "IMEsample";
+            this.Name = "ImEsample";
             this.Text = "IMEsample";
             ((System.ComponentModel.ISupportInitialize)(this.fctb)).EndInit();
             this.ResumeLayout(false);

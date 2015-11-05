@@ -1,19 +1,13 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
-using System.Drawing;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Tester
 {
     public partial class AutocompleteSample4 : Form
     {
-        AutocompleteMenu popupMenu;
-
-        static readonly string[] sources = new string[]{
+        private static readonly string[] Sources =
+        {
             "com",
             "com.company",
             "com.company.Class1",
@@ -28,54 +22,56 @@ namespace Tester
             "com.example.ClassY.Method1"
         };
 
+        private readonly AutocompleteMenu _popupMenu;
+
         public AutocompleteSample4()
         {
             InitializeComponent();
 
             //create autocomplete popup menu
-            popupMenu = new AutocompleteMenu(fctb);
-            popupMenu.SearchPattern = @"[\w\.]";
+            _popupMenu = new AutocompleteMenu(fctb);
+            _popupMenu.SearchPattern = @"[\w\.]";
 
             //
             var items = new List<AutocompleteItem>();
-            foreach (var item in sources)
+            foreach (var item in Sources)
                 items.Add(new MethodAutocompleteItem2(item));
 
-            popupMenu.Items.SetAutocompleteItems(items);
+            _popupMenu.Items.SetAutocompleteItems(items);
         }
     }
 
     /// <summary>
-    /// This autocomplete item appears after dot
+    ///     This autocomplete item appears after dot
     /// </summary>
     public class MethodAutocompleteItem2 : MethodAutocompleteItem
     {
-        string firstPart;
-        string lastPart;
+        private readonly string _firstPart;
+        private readonly string _lastPart;
 
         public MethodAutocompleteItem2(string text)
             : base(text)
         {
             var i = text.LastIndexOf('.');
             if (i < 0)
-                firstPart = text;
+                _firstPart = text;
             else
             {
-                firstPart = text.Substring(0, i);
-                lastPart = text.Substring(i + 1);
+                _firstPart = text.Substring(0, i);
+                _lastPart = text.Substring(i + 1);
             }
         }
 
         public override CompareResult Compare(string fragmentText)
         {
-            int i = fragmentText.LastIndexOf('.');
+            var i = fragmentText.LastIndexOf('.');
 
             if (i < 0)
             {
-                if (firstPart.StartsWith(fragmentText) && string.IsNullOrEmpty(lastPart))
+                if (_firstPart.StartsWith(fragmentText) && string.IsNullOrEmpty(_lastPart))
                     return CompareResult.VisibleAndSelected;
                 //if (firstPart.ToLower().Contains(fragmentText.ToLower()))
-                  //  return CompareResult.Visible;
+                //  return CompareResult.Visible;
             }
             else
             {
@@ -83,15 +79,14 @@ namespace Tester
                 var fragmentLastPart = fragmentText.Substring(i + 1);
 
 
-                if (firstPart != fragmentFirstPart)
+                if (_firstPart != fragmentFirstPart)
                     return CompareResult.Hidden;
 
-                if (lastPart != null && lastPart.StartsWith(fragmentLastPart))
+                if (_lastPart != null && _lastPart.StartsWith(fragmentLastPart))
                     return CompareResult.VisibleAndSelected;
 
-                if (lastPart != null && lastPart.ToLower().Contains(fragmentLastPart.ToLower()))
+                if (_lastPart != null && _lastPart.ToLower().Contains(fragmentLastPart.ToLower()))
                     return CompareResult.Visible;
-
             }
 
             return CompareResult.Hidden;
@@ -99,18 +94,18 @@ namespace Tester
 
         public override string GetTextForReplace()
         {
-            if (lastPart == null)
-                return firstPart;
+            if (_lastPart == null)
+                return _firstPart;
 
-            return firstPart + "." + lastPart;
+            return _firstPart + "." + _lastPart;
         }
 
         public override string ToString()
         {
-            if (lastPart == null)
-                return firstPart;
+            if (_lastPart == null)
+                return _firstPart;
 
-            return lastPart;
+            return _lastPart;
         }
     }
 }

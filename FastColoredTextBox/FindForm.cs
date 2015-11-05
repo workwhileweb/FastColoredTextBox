@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace FastColoredTextBoxNS
 {
     public partial class FindForm : Form
     {
-        bool firstSearch = true;
-        Place startPlace;
-        FastColoredTextBox tb;
+        private bool _firstSearch = true;
+        private Place _startPlace;
+        private readonly FastColoredTextBox _tb;
 
         public FindForm(FastColoredTextBox tb)
         {
             InitializeComponent();
-            this.tb = tb;
+            _tb = tb;
         }
 
         private void btClose_Click(object sender, EventArgs e)
@@ -31,38 +30,38 @@ namespace FastColoredTextBoxNS
         {
             try
             {
-                RegexOptions opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
+                var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
                 if (!cbRegex.Checked)
                     pattern = Regex.Escape(pattern);
                 if (cbWholeWord.Checked)
                     pattern = "\\b" + pattern + "\\b";
                 //
-                Range range = tb.Selection.Clone();
+                var range = _tb.Selection.Clone();
                 range.Normalize();
                 //
-                if (firstSearch)
+                if (_firstSearch)
                 {
-                    startPlace = range.Start;
-                    firstSearch = false;
+                    _startPlace = range.Start;
+                    _firstSearch = false;
                 }
                 //
                 range.Start = range.End;
-                if (range.Start >= startPlace)
-                    range.End = new Place(tb.GetLineLength(tb.LinesCount - 1), tb.LinesCount - 1);
+                if (range.Start >= _startPlace)
+                    range.End = new Place(_tb.GetLineLength(_tb.LinesCount - 1), _tb.LinesCount - 1);
                 else
-                    range.End = startPlace;
+                    range.End = _startPlace;
                 //
                 foreach (var r in range.GetRangesByLines(pattern, opt))
                 {
-                    tb.Selection = r;
-                    tb.DoSelectionVisible();
-                    tb.Invalidate();
+                    _tb.Selection = r;
+                    _tb.DoSelectionVisible();
+                    _tb.Invalidate();
                     return;
                 }
                 //
-                if (range.Start >= startPlace && startPlace > Place.Empty)
+                if (range.Start >= _startPlace && _startPlace > Place.Empty)
                 {
-                    tb.Selection.Start = new Place(0, 0);
+                    _tb.Selection.Start = new Place(0, 0);
                     FindNext(pattern);
                     return;
                 }
@@ -86,7 +85,6 @@ namespace FastColoredTextBoxNS
             {
                 Hide();
                 e.Handled = true;
-                return;
             }
         }
 
@@ -97,14 +95,14 @@ namespace FastColoredTextBoxNS
                 e.Cancel = true;
                 Hide();
             }
-            this.tb.Focus();
+            _tb.Focus();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Escape)
             {
-                this.Close();
+                Close();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -116,9 +114,9 @@ namespace FastColoredTextBoxNS
             ResetSerach();
         }
 
-        void ResetSerach()
+        private void ResetSerach()
         {
-            firstSearch = true;
+            _firstSearch = true;
         }
 
         private void cbMatchCase_CheckedChanged(object sender, EventArgs e)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
@@ -8,24 +7,25 @@ namespace Tester
 {
     public partial class HyperlinkSample : Form
     {
-        TextStyle blueStyle = new TextStyle(Brushes.Blue, null, FontStyle.Underline);
+        private readonly TextStyle _blueStyle = new TextStyle(Brushes.Blue, null, FontStyle.Underline);
 
         public HyperlinkSample()
         {
             InitializeComponent();
         }
 
-        private void fctb_TextChangedDelayed(object sender, FastColoredTextBoxNS.TextChangedEventArgs e)
+        private void fctb_TextChangedDelayed(object sender, TextChangedEventArgs e)
         {
-            e.ChangedRange.ClearStyle(blueStyle);
-            e.ChangedRange.SetStyle(blueStyle, @"(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?");
+            e.ChangedRange.ClearStyle(_blueStyle);
+            e.ChangedRange.SetStyle(_blueStyle,
+                @"(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?");
         }
 
-        bool CharIsHyperlink(Place place)
+        private bool CharIsHyperlink(Place place)
         {
-            var mask = fctb.GetStyleIndexMask(new Style[] { blueStyle });
-            if (place.iChar < fctb.GetLineLength(place.iLine))
-                if ((fctb[place].style & mask) != 0)
+            var mask = fctb.GetStyleIndexMask(new Style[] {_blueStyle});
+            if (place.IChar < fctb.GetLineLength(place.ILine))
+                if ((fctb[place].Style & mask) != 0)
                     return true;
 
             return false;

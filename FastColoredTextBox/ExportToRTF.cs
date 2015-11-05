@@ -1,122 +1,123 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
 namespace FastColoredTextBoxNS
 {
     /// <summary>
-    /// Exports colored text as RTF
+    ///     Exports colored text as RTF
     /// </summary>
     /// <remarks>At this time only TextStyle renderer is supported. Other styles is not exported.</remarks>
-    public class ExportToRTF
+    public class ExportToRtf
     {
-        /// <summary>
-        /// Includes line numbers
-        /// </summary>
-        public bool IncludeLineNumbers { get; set; }
-        /// <summary>
-        /// Use original font
-        /// </summary>
-        public bool UseOriginalFont { get; set; }
+        private readonly Dictionary<Color, int> _colorTable = new Dictionary<Color, int>();
 
-        FastColoredTextBox tb;
-        Dictionary<Color, int> colorTable = new Dictionary<Color, int>();
+        private FastColoredTextBox _tb;
 
-        public ExportToRTF()
+        public ExportToRtf()
         {
             UseOriginalFont = true;
         }
 
+        /// <summary>
+        ///     Includes line numbers
+        /// </summary>
+        public bool IncludeLineNumbers { get; set; }
+
+        /// <summary>
+        ///     Use original font
+        /// </summary>
+        public bool UseOriginalFont { get; set; }
+
         public string GetRtf(FastColoredTextBox tb)
         {
-            this.tb = tb;
-            Range sel = new Range(tb);
+            _tb = tb;
+            var sel = new Range(tb);
             sel.SelectAll();
             return GetRtf(sel);
         }
 
         public string GetRtf(Range r)
         {
-            this.tb = r.tb;
+            _tb = r.Tb;
             var styles = new Dictionary<StyleIndex, object>();
             var sb = new StringBuilder();
-            var tempSB = new StringBuilder();
+            var tempSb = new StringBuilder();
             var currentStyleId = StyleIndex.None;
             r.Normalize();
-            int currentLine = r.Start.iLine;
+            var currentLine = r.Start.ILine;
             styles[currentStyleId] = null;
-            colorTable.Clear();
+            _colorTable.Clear();
             //
-            var lineNumberColor = GetColorTableNumber(r.tb.LineNumberColor);
+            var lineNumberColor = GetColorTableNumber(r.Tb.LineNumberColor);
 
             if (IncludeLineNumbers)
-                tempSB.AppendFormat(@"{{\cf{1} {0}}}\tab", currentLine + 1, lineNumberColor);
+                tempSb.AppendFormat(@"{{\cf{1} {0}}}\tab", currentLine + 1, lineNumberColor);
             //
-            foreach (Place p in r)
+            foreach (var p in r)
             {
-                Char c = r.tb[p.iLine][p.iChar];
-                if (c.style != currentStyleId)
+                var c = r.Tb[p.ILine][p.IChar];
+                if (c.Style != currentStyleId)
                 {
-                    Flush(sb, tempSB, currentStyleId);
-                    currentStyleId = c.style;
+                    Flush(sb, tempSb, currentStyleId);
+                    currentStyleId = c.Style;
                     styles[currentStyleId] = null;
                 }
 
-                if (p.iLine != currentLine)
+                if (p.ILine != currentLine)
                 {
-                    for (int i = currentLine; i < p.iLine; i++)
+                    for (var i = currentLine; i < p.ILine; i++)
                     {
-                        tempSB.AppendLine(@"\line");
+                        tempSb.AppendLine(@"\line");
                         if (IncludeLineNumbers)
-                            tempSB.AppendFormat(@"{{\cf{1} {0}}}\tab", i + 2, lineNumberColor);
+                            tempSb.AppendFormat(@"{{\cf{1} {0}}}\tab", i + 2, lineNumberColor);
                     }
-                    currentLine = p.iLine;
+                    currentLine = p.ILine;
                 }
-                switch (c.c)
+                switch (c.C)
                 {
                     case '\\':
-                        tempSB.Append(@"\\");
+                        tempSb.Append(@"\\");
                         break;
                     case '{':
-                        tempSB.Append(@"\{");
+                        tempSb.Append(@"\{");
                         break;
                     case '}':
-                        tempSB.Append(@"\}");
+                        tempSb.Append(@"\}");
                         break;
                     default:
-                        var ch = c.c;
-                        var code = (int)ch;
-                        if(code < 128)
-                            tempSB.Append(c.c);
+                        var ch = c.C;
+                        var code = (int) ch;
+                        if (code < 128)
+                            tempSb.Append(c.C);
                         else
-                            tempSB.AppendFormat(@"{{\u{0}}}", code);
+                            tempSb.AppendFormat(@"{{\u{0}}}", code);
                         break;
                 }
             }
-            Flush(sb, tempSB, currentStyleId);
-           
+            Flush(sb, tempSb, currentStyleId);
+
             //build color table
             var list = new SortedList<int, Color>();
-            foreach (var pair in colorTable)
+            foreach (var pair in _colorTable)
                 list.Add(pair.Value, pair.Key);
 
-            tempSB.Length = 0;
-            tempSB.AppendFormat(@"{{\colortbl;");
+            tempSb.Length = 0;
+            tempSb.AppendFormat(@"{{\colortbl;");
 
             foreach (var pair in list)
-                tempSB.Append(GetColorAsString(pair.Value)+";");
-            tempSB.AppendLine("}");
+                tempSb.Append(GetColorAsString(pair.Value) + ";");
+            tempSb.AppendLine("}");
 
             //
             if (UseOriginalFont)
             {
                 sb.Insert(0, string.Format(@"{{\fonttbl{{\f0\fmodern {0};}}}}{{\fs{1} ",
-                                tb.Font.Name, (int)(2 * tb.Font.SizeInPoints), tb.CharHeight));
+                    _tb.Font.Name, (int) (2*_tb.Font.SizeInPoints), _tb.CharHeight));
                 sb.AppendLine(@"}");
             }
 
-            sb.Insert(0, tempSB.ToString());
+            sb.Insert(0, tempSb.ToString());
 
             sb.Insert(0, @"{\rtf1\ud\deff0");
             sb.AppendLine(@"}");
@@ -124,24 +125,24 @@ namespace FastColoredTextBoxNS
             return sb.ToString();
         }
 
-        private RTFStyleDescriptor GetRtfDescriptor(StyleIndex styleIndex)
+        private RtfStyleDescriptor GetRtfDescriptor(StyleIndex styleIndex)
         {
-            List<Style> styles = new List<Style>();
+            var styles = new List<Style>();
             //find text renderer
             TextStyle textStyle = null;
-            int mask = 1;
-            bool hasTextStyle = false;
-            for (int i = 0; i < tb.Styles.Length; i++)
+            var mask = 1;
+            var hasTextStyle = false;
+            for (var i = 0; i < _tb.Styles.Length; i++)
             {
-                if (tb.Styles[i] != null && ((int)styleIndex & mask) != 0)
-                    if (tb.Styles[i].IsExportable)
+                if (_tb.Styles[i] != null && ((int) styleIndex & mask) != 0)
+                    if (_tb.Styles[i].IsExportable)
                     {
-                        var style = tb.Styles[i];
+                        var style = _tb.Styles[i];
                         styles.Add(style);
 
-                        bool isTextStyle = style is TextStyle;
+                        var isTextStyle = style is TextStyle;
                         if (isTextStyle)
-                            if (!hasTextStyle || tb.AllowSeveralTextStyleDrawing)
+                            if (!hasTextStyle || _tb.AllowSeveralTextStyleDrawing)
                             {
                                 hasTextStyle = true;
                                 textStyle = style as TextStyle;
@@ -150,16 +151,16 @@ namespace FastColoredTextBoxNS
                 mask = mask << 1;
             }
             //add TextStyle css
-            RTFStyleDescriptor result = null;
+            RtfStyleDescriptor result = null;
 
             if (!hasTextStyle)
             {
                 //draw by default renderer
-                result = tb.DefaultStyle.GetRTF();
+                result = _tb.DefaultStyle.GetRtf();
             }
             else
             {
-                result = textStyle.GetRTF();
+                result = textStyle.GetRtf();
             }
 
             return result;
@@ -172,10 +173,10 @@ namespace FastColoredTextBoxNS
             return string.Format(@"\red{0}\green{1}\blue{2}", color.R, color.G, color.B);
         }
 
-        private void Flush(StringBuilder sb, StringBuilder tempSB, StyleIndex currentStyle)
+        private void Flush(StringBuilder sb, StringBuilder tempSb, StyleIndex currentStyle)
         {
             //find textRenderer
-            if (tempSB.Length == 0)
+            if (tempSb.Length == 0)
                 return;
 
             var desc = GetRtfDescriptor(currentStyle);
@@ -186,14 +187,14 @@ namespace FastColoredTextBoxNS
                 tags.AppendFormat(@"\cf{0}", cf);
             if (cb >= 0)
                 tags.AppendFormat(@"\highlight{0}", cb);
-            if(!string.IsNullOrEmpty(desc.AdditionalTags))
+            if (!string.IsNullOrEmpty(desc.AdditionalTags))
                 tags.Append(desc.AdditionalTags.Trim());
 
-            if(tags.Length > 0)
-                sb.AppendFormat(@"{{{0} {1}}}", tags, tempSB.ToString());
+            if (tags.Length > 0)
+                sb.AppendFormat(@"{{{0} {1}}}", tags, tempSb);
             else
-                sb.Append(tempSB.ToString());
-            tempSB.Length = 0;
+                sb.Append(tempSb);
+            tempSb.Length = 0;
         }
 
         private int GetColorTableNumber(Color color)
@@ -201,14 +202,14 @@ namespace FastColoredTextBoxNS
             if (color.A == 0)
                 return -1;
 
-            if (!colorTable.ContainsKey(color))
-                colorTable[color] = colorTable.Count + 1;
+            if (!_colorTable.ContainsKey(color))
+                _colorTable[color] = _colorTable.Count + 1;
 
-            return colorTable[color];
+            return _colorTable[color];
         }
     }
 
-    public class RTFStyleDescriptor
+    public class RtfStyleDescriptor
     {
         public Color ForeColor { get; set; }
         public Color BackColor { get; set; }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -10,18 +8,18 @@ namespace FastColoredTextBoxNS
 {
     public partial class HotkeysEditorForm : Form
     {
-        BindingList<HotkeyWrapper> wrappers = new BindingList<HotkeyWrapper>();
+        private readonly BindingList<HotkeyWrapper> _wrappers = new BindingList<HotkeyWrapper>();
 
         public HotkeysEditorForm(HotkeysMapping hotkeys)
         {
             InitializeComponent();
             BuildWrappers(hotkeys);
-            dgv.DataSource = wrappers;
+            dgv.DataSource = _wrappers;
         }
 
-        int CompereKeys(Keys key1, Keys key2)
+        private int CompereKeys(Keys key1, Keys key2)
         {
-            var res = ((int)key1 & 0xff).CompareTo((int)key2 & 0xff);
+            var res = ((int) key1 & 0xff).CompareTo((int) key2 & 0xff);
             if (res == 0)
                 res = key1.CompareTo(key2);
 
@@ -33,19 +31,19 @@ namespace FastColoredTextBoxNS
             var keys = new List<Keys>(hotkeys.Keys);
             keys.Sort(CompereKeys);
 
-            wrappers.Clear();
+            _wrappers.Clear();
             foreach (var k in keys)
-                wrappers.Add(new HotkeyWrapper(k, hotkeys[k]));
+                _wrappers.Add(new HotkeyWrapper(k, hotkeys[k]));
         }
 
         /// <summary>
-        /// Returns edited hotkey map
+        ///     Returns edited hotkey map
         /// </summary>
         /// <returns></returns>
         public HotkeysMapping GetHotkeys()
         {
             var result = new HotkeysMapping();
-            foreach (var w in wrappers)
+            foreach (var w in _wrappers)
                 result[w.ToKeyData()] = w.Action;
 
             return result;
@@ -53,48 +51,56 @@ namespace FastColoredTextBoxNS
 
         private void btAdd_Click(object sender, EventArgs e)
         {
-            wrappers.Add(new HotkeyWrapper(Keys.None, FCTBAction.None));
+            _wrappers.Add(new HotkeyWrapper(Keys.None, FctbAction.None));
         }
 
         private void dgv_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
             var cell = (dgv[0, e.RowIndex] as DataGridViewComboBoxCell);
-            if(cell.Items.Count == 0)
-            foreach(var item in new string[]{"", "Ctrl", "Ctrl + Shift", "Ctrl + Alt", "Shift", "Shift + Alt", "Alt", "Ctrl + Shift + Alt"})
-                cell.Items.Add(item);
+            if (cell.Items.Count == 0)
+                foreach (
+                    var item in
+                        new[]
+                        {"", "Ctrl", "Ctrl + Shift", "Ctrl + Alt", "Shift", "Shift + Alt", "Alt", "Ctrl + Shift + Alt"})
+                    cell.Items.Add(item);
 
             cell = (dgv[1, e.RowIndex] as DataGridViewComboBoxCell);
             if (cell.Items.Count == 0)
-            foreach (var item in Enum.GetValues(typeof(Keys)))
-                cell.Items.Add(item);
+                foreach (var item in Enum.GetValues(typeof (Keys)))
+                    cell.Items.Add(item);
 
             cell = (dgv[2, e.RowIndex] as DataGridViewComboBoxCell);
             if (cell.Items.Count == 0)
-            foreach (var item in Enum.GetValues(typeof(FCTBAction)))
-                cell.Items.Add(item);
+                foreach (var item in Enum.GetValues(typeof (FctbAction)))
+                    cell.Items.Add(item);
         }
 
         private void btResore_Click(object sender, EventArgs e)
         {
-            HotkeysMapping h = new HotkeysMapping();
+            var h = new HotkeysMapping();
             h.InitDefault();
             BuildWrappers(h);
         }
 
         private void btRemove_Click(object sender, EventArgs e)
         {
-            for (int i = dgv.RowCount - 1; i >= 0; i--)
+            for (var i = dgv.RowCount - 1; i >= 0; i--)
                 if (dgv.Rows[i].Selected) dgv.Rows.RemoveAt(i);
         }
 
         private void HotkeysEditorForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(DialogResult == System.Windows.Forms.DialogResult.OK)
+            if (DialogResult == DialogResult.OK)
             {
                 var actions = GetUnAssignedActions();
                 if (!string.IsNullOrEmpty(actions))
                 {
-                    if (MessageBox.Show("Some actions are not assigned!\r\nActions: " + actions + "\r\nPress Yes to save and exit, press No to continue editing", "Some actions is not assigned", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+                    if (
+                        MessageBox.Show(
+                            "Some actions are not assigned!\r\nActions: " + actions +
+                            "\r\nPress Yes to save and exit, press No to continue editing",
+                            "Some actions is not assigned", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) ==
+                        DialogResult.No)
                         e.Cancel = true;
                 }
             }
@@ -102,19 +108,19 @@ namespace FastColoredTextBoxNS
 
         private string GetUnAssignedActions()
         {
-            StringBuilder sb = new StringBuilder();
-            var dic = new Dictionary<FCTBAction, FCTBAction>();
+            var sb = new StringBuilder();
+            var dic = new Dictionary<FctbAction, FctbAction>();
 
-            foreach (var w in wrappers)
+            foreach (var w in _wrappers)
                 dic[w.Action] = w.Action;
 
-            foreach (var item in Enum.GetValues(typeof(FCTBAction)))
-            if ((FCTBAction)item != FCTBAction.None)
-            if(!((FCTBAction)item).ToString().StartsWith("CustomAction"))
-            {
-                if(!dic.ContainsKey((FCTBAction)item))
-                    sb.Append(item+", ");
-            }
+            foreach (var item in Enum.GetValues(typeof (FctbAction)))
+                if ((FctbAction) item != FctbAction.None)
+                    if (!((FctbAction) item).ToString().StartsWith("CustomAction"))
+                    {
+                        if (!dic.ContainsKey((FctbAction) item))
+                            sb.Append(item + ", ");
+                    }
 
             return sb.ToString().TrimEnd(' ', ',');
         }
@@ -122,39 +128,30 @@ namespace FastColoredTextBoxNS
 
     internal class HotkeyWrapper
     {
-        public HotkeyWrapper(Keys keyData, FCTBAction action)
+        private bool _alt;
+
+        private bool _ctrl;
+        private bool _shift;
+
+        public HotkeyWrapper(Keys keyData, FctbAction action)
         {
-            KeyEventArgs a = new KeyEventArgs(keyData);
-            Ctrl = a.Control;
-            Shift = a.Shift;
-            Alt = a.Alt;
+            var a = new KeyEventArgs(keyData);
+            _ctrl = a.Control;
+            _shift = a.Shift;
+            _alt = a.Alt;
 
             Key = a.KeyCode;
             Action = action;
         }
 
-        public Keys ToKeyData()
-        {
-            var res = Key;
-            if (Ctrl) res |= Keys.Control;
-            if (Alt) res |= Keys.Alt;
-            if (Shift) res |= Keys.Shift;
-
-            return res;
-        }
-
-        bool Ctrl;
-        bool Shift;
-        bool Alt;
-        
         public string Modifiers
         {
             get
             {
                 var res = "";
-                if (Ctrl) res += "Ctrl + ";
-                if (Shift) res += "Shift + ";
-                if (Alt) res += "Alt + ";
+                if (_ctrl) res += "Ctrl + ";
+                if (_shift) res += "Shift + ";
+                if (_alt) res += "Alt + ";
 
                 return res.Trim(' ', '+');
             }
@@ -162,18 +159,28 @@ namespace FastColoredTextBoxNS
             {
                 if (value == null)
                 {
-                    Ctrl = Alt = Shift = false;
+                    _ctrl = _alt = _shift = false;
                 }
                 else
                 {
-                    Ctrl = value.Contains("Ctrl");
-                    Shift = value.Contains("Shift");
-                    Alt = value.Contains("Alt");
+                    _ctrl = value.Contains("Ctrl");
+                    _shift = value.Contains("Shift");
+                    _alt = value.Contains("Alt");
                 }
             }
         }
 
         public Keys Key { get; set; }
-        public FCTBAction Action { get; set; }
+        public FctbAction Action { get; set; }
+
+        public Keys ToKeyData()
+        {
+            var res = Key;
+            if (_ctrl) res |= Keys.Control;
+            if (_alt) res |= Keys.Alt;
+            if (_shift) res |= Keys.Shift;
+
+            return res;
+        }
     }
 }

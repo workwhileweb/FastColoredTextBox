@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Tester
@@ -70,7 +64,7 @@ namespace Tester
 
         private void button11_Click(object sender, EventArgs e)
         {
-            new IMEsample().Show();
+            new ImEsample().Show();
         }
 
         private void button12_Click(object sender, EventArgs e)
@@ -185,7 +179,7 @@ namespace Tester
 
         private void button33_Click(object sender, EventArgs e)
         {
-            new AutocompleteSample4().Show(); 
+            new AutocompleteSample4().Show();
         }
 
         private void button34_Click(object sender, EventArgs e)

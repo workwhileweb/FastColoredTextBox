@@ -8,7 +8,7 @@ namespace Tester
     {
         public HintSample()
         {
-            InitializeComponent();   
+            InitializeComponent();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -17,7 +17,7 @@ namespace Tester
             foreach (var r in fctb.GetRanges(tbFind.Text))
             {
                 Hint hint;
-                if(cbSimple.Checked)
+                if (cbSimple.Checked)
                     hint = new Hint(r, "This is hint " + fctb.Hints.Count, cbInline.Checked, cbDock.Checked);
                 else
                     hint = new Hint(r, new CustomHint(), cbInline.Checked, cbDock.Checked);

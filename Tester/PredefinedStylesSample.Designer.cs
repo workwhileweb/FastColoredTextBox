@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.label2 = new System.Windows.Forms.Label();
-            this.fctb = new Tester.ReadOnlyFCTB();
+            this.fctb = new Tester.ReadOnlyFctb();
             ((System.ComponentModel.ISupportInitialize)(this.fctb)).BeginInit();
             this.SuspendLayout();
             // 
@@ -79,6 +79,6 @@
         #endregion
 
         private System.Windows.Forms.Label label2;
-        private ReadOnlyFCTB fctb;
+        private ReadOnlyFctb fctb;
     }
 }

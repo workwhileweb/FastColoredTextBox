@@ -1,42 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace FastColoredTextBoxNS
 {
     public static class PlatformType
     {
-        const ushort PROCESSOR_ARCHITECTURE_INTEL = 0;
-        const ushort PROCESSOR_ARCHITECTURE_IA64 = 6;
-        const ushort PROCESSOR_ARCHITECTURE_AMD64 = 9;
-        const ushort PROCESSOR_ARCHITECTURE_UNKNOWN = 0xFFFF;
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct SYSTEM_INFO
-        {
-            public ushort wProcessorArchitecture;
-            public ushort wReserved;
-            public uint dwPageSize;
-            public IntPtr lpMinimumApplicationAddress;
-            public IntPtr lpMaximumApplicationAddress;
-            public UIntPtr dwActiveProcessorMask;
-            public uint dwNumberOfProcessors;
-            public uint dwProcessorType;
-            public uint dwAllocationGranularity;
-            public ushort wProcessorLevel;
-            public ushort wProcessorRevision;
-        };
+        private const ushort ProcessorArchitectureIntel = 0;
+        private const ushort ProcessorArchitectureIa64 = 6;
+        private const ushort ProcessorArchitectureAmd64 = 9;
+        private const ushort ProcessorArchitectureUnknown = 0xFFFF;
 
         [DllImport("kernel32.dll")]
-        static extern void GetNativeSystemInfo(ref SYSTEM_INFO lpSystemInfo);
+        private static extern void GetNativeSystemInfo(ref SystemInfo lpSystemInfo);
 
         [DllImport("kernel32.dll")]
-        static extern void GetSystemInfo(ref SYSTEM_INFO lpSystemInfo);
+        private static extern void GetSystemInfo(ref SystemInfo lpSystemInfo);
 
         public static Platform GetOperationSystemPlatform()
         {
-            var sysInfo = new SYSTEM_INFO();
+            var sysInfo = new SystemInfo();
 
             // WinXP and older - use GetNativeSystemInfo
             if (Environment.OSVersion.Version.Major > 5 ||
@@ -52,17 +34,33 @@ namespace FastColoredTextBoxNS
 
             switch (sysInfo.wProcessorArchitecture)
             {
-                case PROCESSOR_ARCHITECTURE_IA64:
-                case PROCESSOR_ARCHITECTURE_AMD64:
+                case ProcessorArchitectureIa64:
+                case ProcessorArchitectureAmd64:
                     return Platform.X64;
 
-                case PROCESSOR_ARCHITECTURE_INTEL:
+                case ProcessorArchitectureIntel:
                     return Platform.X86;
 
                 default:
                     return Platform.Unknown;
             }
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SystemInfo
+        {
+            public readonly ushort wProcessorArchitecture;
+            public readonly ushort wReserved;
+            public readonly uint dwPageSize;
+            public readonly IntPtr lpMinimumApplicationAddress;
+            public readonly IntPtr lpMaximumApplicationAddress;
+            public readonly UIntPtr dwActiveProcessorMask;
+            public readonly uint dwNumberOfProcessors;
+            public readonly uint dwProcessorType;
+            public readonly uint dwAllocationGranularity;
+            public readonly ushort wProcessorLevel;
+            public readonly ushort wProcessorRevision;
+        };
     }
 
     public enum Platform
@@ -71,5 +69,4 @@ namespace FastColoredTextBoxNS
         X64,
         Unknown
     }
-
 }

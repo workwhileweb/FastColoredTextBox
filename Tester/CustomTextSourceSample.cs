@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
+using Char = FastColoredTextBoxNS.Char;
 
 namespace Tester
 {
@@ -18,10 +19,10 @@ namespace Tester
         {
             var sb = new StringBuilder();
             var dt = DateTime.Now;
-            for (int i = 0; i < 500000; i++)
+            for (var i = 0; i < 500000; i++)
             {
-                sb.AppendFormat("{0}  POST http://mysite.com/{1}.aspx HTTP1.0\n", dt.AddSeconds(i), i % 20);
-                sb.AppendFormat("{0}  GET http://myothersite.com/{1}.aspx HTTP1.1\n", dt.AddSeconds(i), i % 20);
+                sb.AppendFormat("{0}  POST http://mysite.com/{1}.aspx HTTP1.0\n", dt.AddSeconds(i), i%20);
+                sb.AppendFormat("{0}  GET http://myothersite.com/{1}.aspx HTTP1.1\n", dt.AddSeconds(i), i%20);
             }
 
             return sb.ToString();
@@ -50,46 +51,64 @@ namespace Tester
 
 
     /// <summary>
-    /// Text source for displaying readonly text, given as string.
+    ///     Text source for displaying readonly text, given as string.
     /// </summary>
     public class StringTextSource : TextSource, IDisposable
     {
-        List<int> sourceStringLinePositions = new List<int>();
-        string sourceString;
-        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+        private string _sourceString;
+        private readonly List<int> _sourceStringLinePositions = new List<int>();
+        private readonly Timer _timer = new Timer();
 
         public StringTextSource(FastColoredTextBox tb)
             : base(tb)
         {
-            timer.Interval = 10000;
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Enabled = true;
+            _timer.Interval = 10000;
+            _timer.Tick += timer_Tick;
+            _timer.Enabled = true;
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        public override Line this[int i]
         {
-            timer.Enabled = false;
+            get
+            {
+                if (Lines[i] != null)
+                    return Lines[i];
+                LoadLineFromSourceString(i);
+
+                return Lines[i];
+            }
+            set { throw new NotImplementedException(); }
+        }
+
+        public override void Dispose()
+        {
+            _timer.Dispose();
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            _timer.Enabled = false;
             try
             {
                 UnloadUnusedLines();
             }
             finally
             {
-                timer.Enabled = true;
+                _timer.Enabled = true;
             }
         }
 
         private void UnloadUnusedLines()
         {
             const int margin = 2000;
-            var iStartVisibleLine = CurrentTB.VisibleRange.Start.iLine;
-            var iFinishVisibleLine = CurrentTB.VisibleRange.End.iLine;
+            var iStartVisibleLine = CurrentTb.VisibleRange.Start.ILine;
+            var iFinishVisibleLine = CurrentTb.VisibleRange.End.ILine;
 
-            int count = 0;
-            for (int i = 0; i < Count; i++)
-                if (base.lines[i] != null && !base.lines[i].IsChanged && Math.Abs(i - iFinishVisibleLine) > margin)
+            var count = 0;
+            for (var i = 0; i < Count; i++)
+                if (Lines[i] != null && !Lines[i].IsChanged && Math.Abs(i - iFinishVisibleLine) > margin)
                 {
-                    base.lines[i] = null;
+                    Lines[i] = null;
                     count++;
                 }
 #if debug
@@ -101,51 +120,34 @@ namespace Tester
         {
             Clear();
 
-            this.sourceString = sourceString;
+            _sourceString = sourceString;
 
             //parse lines
-            int index = -1;
+            var index = -1;
             do
             {
-                sourceStringLinePositions.Add(index + 1);
-                base.lines.Add(null);
-                index = sourceString.IndexOf('\n', index+1);
+                _sourceStringLinePositions.Add(index + 1);
+                Lines.Add(null);
+                index = sourceString.IndexOf('\n', index + 1);
             } while (index >= 0);
 
             OnLineInserted(0, Count);
 
             //load first lines for calc width of the text
-            var linesCount = Math.Min(lines.Count, CurrentTB.Height / CurrentTB.CharHeight);
-            for (int i = 0; i < linesCount; i++)
+            var linesCount = Math.Min(Lines.Count, CurrentTb.Height/CurrentTb.CharHeight);
+            for (var i = 0; i < linesCount; i++)
                 LoadLineFromSourceString(i);
 
             NeedRecalc(new TextChangedEventArgs(0, linesCount - 1));
-            if (CurrentTB.WordWrap)
+            if (CurrentTb.WordWrap)
                 OnRecalcWordWrap(new TextChangedEventArgs(0, linesCount - 1));
         }
 
         public override void ClearIsChanged()
         {
-            foreach (var line in lines)
+            foreach (var line in Lines)
                 if (line != null)
                     line.IsChanged = false;
-        }
-
-        public override Line this[int i]
-        {
-            get
-            {
-                if (base.lines[i] != null)
-                    return lines[i];
-                else
-                    LoadLineFromSourceString(i);
-
-                return lines[i];
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         private void LoadLineFromSourceString(int i)
@@ -153,17 +155,18 @@ namespace Tester
             var line = CreateLine();
 
             string s;
-            if(i == Count - 1)
-                s = sourceString.Substring(sourceStringLinePositions[i]);
+            if (i == Count - 1)
+                s = _sourceString.Substring(_sourceStringLinePositions[i]);
             else
-                s = sourceString.Substring(sourceStringLinePositions[i], sourceStringLinePositions[i + 1] - sourceStringLinePositions[i] - 1);
+                s = _sourceString.Substring(_sourceStringLinePositions[i],
+                    _sourceStringLinePositions[i + 1] - _sourceStringLinePositions[i] - 1);
 
             foreach (var c in s)
-                line.Add(new FastColoredTextBoxNS.Char(c));
+                line.Add(new Char(c));
 
-            base.lines[i] = line;
+            Lines[i] = line;
 
-            if (CurrentTB.WordWrap)
+            if (CurrentTb.WordWrap)
                 OnRecalcWordWrap(new TextChangedEventArgs(i, i));
         }
 
@@ -180,37 +183,29 @@ namespace Tester
 
         public override int GetLineLength(int i)
         {
-            if (base.lines[i] == null)
+            if (Lines[i] == null)
                 return 0;
-            else
-                return base.lines[i].Count;
+            return Lines[i].Count;
         }
 
         public override bool LineHasFoldingStartMarker(int iLine)
         {
-            if (lines[iLine] == null)
+            if (Lines[iLine] == null)
                 return false;
-            else
-                return !string.IsNullOrEmpty(lines[iLine].FoldingStartMarker);
+            return !string.IsNullOrEmpty(Lines[iLine].FoldingStartMarker);
         }
 
         public override bool LineHasFoldingEndMarker(int iLine)
         {
-            if (lines[iLine] == null)
+            if (Lines[iLine] == null)
                 return false;
-            else
-                return !string.IsNullOrEmpty(lines[iLine].FoldingEndMarker);
-        }
-
-        public override void Dispose()
-        {
-            timer.Dispose();
+            return !string.IsNullOrEmpty(Lines[iLine].FoldingEndMarker);
         }
 
         internal void UnloadLine(int iLine)
         {
-            if (lines[iLine] != null && !lines[iLine].IsChanged)
-                lines[iLine] = null;
+            if (Lines[iLine] != null && !Lines[iLine].IsChanged)
+                Lines[iLine] = null;
         }
     }
 }

@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
@@ -12,9 +7,9 @@ namespace Tester
 {
     public partial class LoggerSample : Form
     {
-        TextStyle infoStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
-        TextStyle warningStyle = new TextStyle(Brushes.BurlyWood, null, FontStyle.Regular);
-        TextStyle errorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular);
+        private readonly TextStyle _errorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular);
+        private readonly TextStyle _infoStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
+        private readonly TextStyle _warningStyle = new TextStyle(Brushes.BurlyWood, null, FontStyle.Regular);
 
         public LoggerSample()
         {
@@ -23,14 +18,17 @@ namespace Tester
 
         private void tm_Tick(object sender, EventArgs e)
         {
-            switch (DateTime.Now.Millisecond % 3)
+            switch (DateTime.Now.Millisecond%3)
             {
                 case 0:
-                    Log(DateTime.Now + " Error\r\n", errorStyle); break;
+                    Log(DateTime.Now + " Error\r\n", _errorStyle);
+                    break;
                 case 1:
-                    Log(DateTime.Now + " Warning\r\n", warningStyle); break;
+                    Log(DateTime.Now + " Warning\r\n", _warningStyle);
+                    break;
                 case 2:
-                    Log(DateTime.Now + " Info\r\n", infoStyle); break;
+                    Log(DateTime.Now + " Info\r\n", _infoStyle);
+                    break;
             }
         }
 
@@ -42,16 +40,16 @@ namespace Tester
             //remember user selection
             var userSelection = fctb.Selection.Clone();
             //add text with predefined style
-            fctb.TextSource.CurrentTB = fctb;
+            fctb.TextSource.CurrentTb = fctb;
             fctb.AppendText(text, style);
             //restore user selection
-            if (!userSelection.IsEmpty || userSelection.Start.iLine < fctb.LinesCount - 2)
+            if (!userSelection.IsEmpty || userSelection.Start.ILine < fctb.LinesCount - 2)
             {
                 fctb.Selection.Start = userSelection.Start;
                 fctb.Selection.End = userSelection.End;
             }
             else
-                fctb.GoEnd();//scroll to end of the text
+                fctb.GoEnd(); //scroll to end of the text
             //
             fctb.Selection.EndUpdate();
             fctb.EndUpdate();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,7 +9,7 @@ namespace Tester
 {
     public partial class ConsoleSample : Form
     {
-        private bool stop;
+        private bool _stop;
 
         public ConsoleSample()
         {
@@ -21,13 +20,13 @@ namespace Tester
         {
             base.OnShown(e);
 
-            string text = "";
-            stop = false;
+            var text = "";
+            _stop = false;
             do
             {
                 consoleTextBox1.WriteLine("Enter some line: ");
                 text = consoleTextBox1.ReadLine();
-            } while (text != "" && !stop);
+            } while (text != "" && !_stop);
 
             consoleTextBox1.WriteLine("End of enetering.");
         }
@@ -38,39 +37,39 @@ namespace Tester
             base.OnClosing(e);
         }
 
-        void Stop()
+        private void Stop()
         {
-            stop = true;
+            _stop = true;
             consoleTextBox1.IsReadLineMode = false;
         }
     }
 
     /// <summary>
-    /// Console emulator.
+    ///     Console emulator.
     /// </summary>
     public class ConsoleTextBox : FastColoredTextBox
     {
-        private volatile bool isReadLineMode;
-        private volatile bool isUpdating;
+        private volatile bool _isReadLineMode;
+        private volatile bool _isUpdating;
         private Place StartReadPlace { get; set; }
 
         /// <summary>
-        /// Control is waiting for line entering. 
+        ///     Control is waiting for line entering.
         /// </summary>
         public bool IsReadLineMode
         {
-            get { return isReadLineMode; }
-            set { isReadLineMode = value; }
+            get { return _isReadLineMode; }
+            set { _isReadLineMode = value; }
         }
 
         /// <summary>
-        /// Append line to end of text.
+        ///     Append line to end of text.
         /// </summary>
         /// <param name="text"></param>
         public void WriteLine(string text)
         {
             IsReadLineMode = false;
-            isUpdating = true;
+            _isUpdating = true;
             try
             {
                 AppendText(text);
@@ -78,14 +77,14 @@ namespace Tester
             }
             finally
             {
-                isUpdating = false;
+                _isUpdating = false;
                 ClearUndo();
             }
         }
 
         /// <summary>
-        /// Wait for line entering.
-        /// Set IsReadLineMode to false for break of waiting.
+        ///     Wait for line entering.
+        ///     Set IsReadLineMode to false for break of waiting.
         /// </summary>
         /// <returns></returns>
         public string ReadLine()
@@ -112,7 +111,7 @@ namespace Tester
 
         public override void OnTextChanging(ref string text)
         {
-            if (!IsReadLineMode && !isUpdating)
+            if (!IsReadLineMode && !_isUpdating)
             {
                 text = ""; //cancel changing
                 return;
@@ -121,7 +120,7 @@ namespace Tester
             if (IsReadLineMode)
             {
                 if (Selection.Start < StartReadPlace || Selection.End < StartReadPlace)
-                    GoEnd();//move caret to entering position
+                    GoEnd(); //move caret to entering position
 
                 if (Selection.Start == StartReadPlace || Selection.End == StartReadPlace)
                     if (text == "\b") //backspace
@@ -142,15 +141,15 @@ namespace Tester
 
         public override void Clear()
         {
-            var oldIsReadMode = isReadLineMode;
+            var oldIsReadMode = _isReadLineMode;
 
-            isReadLineMode = false;
-            isUpdating = true;
+            _isReadLineMode = false;
+            _isUpdating = true;
 
             base.Clear();
 
-            isUpdating = false;
-            isReadLineMode = oldIsReadMode;
+            _isUpdating = false;
+            _isReadLineMode = oldIsReadMode;
 
             StartReadPlace = Place.Empty;
         }

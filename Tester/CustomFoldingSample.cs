@@ -1,7 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using FastColoredTextBoxNS;
-using System.Text.RegularExpressions;
 
 namespace Tester
 {
@@ -21,7 +19,7 @@ namespace Tester
             var currentIndent = 0;
             var lastNonEmptyLine = 0;
 
-            for (int i = 0; i < fctb.LinesCount; i++)
+            for (var i = 0; i < fctb.LinesCount; i++)
             {
                 var line = fctb[i];
                 var spacesCount = line.StartSpacesCount;
@@ -31,8 +29,7 @@ namespace Tester
                 if (currentIndent < spacesCount)
                     //append start folding marker
                     fctb[lastNonEmptyLine].FoldingStartMarker = "m" + currentIndent;
-                else
-                if (currentIndent > spacesCount)
+                else if (currentIndent > spacesCount)
                     //append end folding marker
                     fctb[lastNonEmptyLine].FoldingEndMarker = "m" + spacesCount;
 

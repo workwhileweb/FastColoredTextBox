@@ -1,10 +1,7 @@
-﻿using System.Windows.Forms;
-using FastColoredTextBoxNS;
-using System.Drawing;
-using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using System;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using FastColoredTextBoxNS;
 
 namespace Tester
 {
@@ -18,10 +15,10 @@ namespace Tester
 
         private void cbAutoIndentType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(cbAutoIndentType.SelectedIndex == 0)//built-in C# AutoIndent
+            if (cbAutoIndentType.SelectedIndex == 0) //built-in C# AutoIndent
             {
                 fctb.Language = Language.CSharp;
-                fctb.AutoIndentNeeded -= new EventHandler<AutoIndentEventArgs>(fctb_AutoIndentNeeded);
+                fctb.AutoIndentNeeded -= fctb_AutoIndentNeeded;
                 fctb.Text = @"/// Please, type next text (without slashes):
 /// int Foo()
 /// {
@@ -42,10 +39,10 @@ namespace Tester
                 fctb.Focus();
             }
 
-            if(cbAutoIndentType.SelectedIndex == 1)//custom AutoIndent
+            if (cbAutoIndentType.SelectedIndex == 1) //custom AutoIndent
             {
                 fctb.Language = Language.Custom;
-                fctb.AutoIndentNeeded += new EventHandler<AutoIndentEventArgs>(fctb_AutoIndentNeeded);
+                fctb.AutoIndentNeeded += fctb_AutoIndentNeeded;
                 fctb.Text = @"/// Please, type next text (without slashes):
 /// begin
 /// i := 1;
@@ -63,7 +60,7 @@ namespace Tester
             }
         }
 
-        void fctb_AutoIndentNeeded(object sender, AutoIndentEventArgs e)
+        private void fctb_AutoIndentNeeded(object sender, AutoIndentEventArgs e)
         {
             // if current line is "begin" then next
             // line shift to right
@@ -87,7 +84,6 @@ namespace Tester
                 !Regex.IsMatch(e.LineText, @"\bbegin\b"))
             {
                 e.Shift = e.TabLength;
-                return;
             }
         }
     }

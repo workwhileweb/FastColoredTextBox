@@ -1,85 +1,84 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Drawing.Drawing2D;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FastColoredTextBoxNS
 {
     /// <summary>
-    /// Shows document map of FCTB
+    ///     Shows document map of FCTB
     /// </summary>
     public class DocumentMap : Control
     {
+        private bool _needRepaint = true;
+        private float _scale = 0.3f;
+        private bool _scrollbarVisible = true;
+        private Place _startPlace = Place.Empty;
+
+        private FastColoredTextBox _target;
         public EventHandler TargetChanged;
 
-        FastColoredTextBox target;
-        private float scale = 0.3f;
-        private bool needRepaint = true;
-        private Place startPlace = Place.Empty;
-        private bool scrollbarVisible = true;
+        public DocumentMap()
+        {
+            ForeColor = Color.Maroon;
+            SetStyle(
+                ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint |
+                ControlStyles.ResizeRedraw, true);
+            Application.Idle += Application_Idle;
+        }
 
         [Description("Target FastColoredTextBox")]
         public FastColoredTextBox Target
         {
-            get { return target; }
+            get { return _target; }
             set
             {
-                if (target != null)
-                    UnSubscribe(target);
+                if (_target != null)
+                    UnSubscribe(_target);
 
-                target = value;
+                _target = value;
                 if (value != null)
                 {
-                    Subscribe(target);
+                    Subscribe(_target);
                 }
                 OnTargetChanged();
             }
         }
 
         /// <summary>
-        /// Scale
+        ///     Scale
         /// </summary>
         [Description("Scale")]
         [DefaultValue(0.3f)]
         public float Scale
         {
-            get { return scale; }
+            get { return _scale; }
             set
             {
-                scale = value;
+                _scale = value;
                 NeedRepaint();
             }
         }
 
         /// <summary>
-        /// Scrollbar visibility
+        ///     Scrollbar visibility
         /// </summary>
         [Description("Scrollbar visibility")]
         [DefaultValue(true)]
         public bool ScrollbarVisible
         {
-            get { return scrollbarVisible; }
+            get { return _scrollbarVisible; }
             set
             {
-                scrollbarVisible = value;
+                _scrollbarVisible = value;
                 NeedRepaint();
             }
         }
 
-        public DocumentMap()
+        private void Application_Idle(object sender, EventArgs e)
         {
-            ForeColor = Color.Maroon;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
-            Application.Idle += Application_Idle;
-        }
-
-        void Application_Idle(object sender, EventArgs e)
-        {
-            if(needRepaint)
+            if (_needRepaint)
                 Invalidate();
         }
 
@@ -93,16 +92,16 @@ namespace FastColoredTextBoxNS
 
         protected virtual void UnSubscribe(FastColoredTextBox target)
         {
-            target.Scroll -= new ScrollEventHandler(Target_Scroll);
-            target.SelectionChangedDelayed -= new EventHandler(Target_SelectionChanged);
-            target.VisibleRangeChanged -= new EventHandler(Target_VisibleRangeChanged);
+            target.Scroll -= Target_Scroll;
+            target.SelectionChangedDelayed -= Target_SelectionChanged;
+            target.VisibleRangeChanged -= Target_VisibleRangeChanged;
         }
 
         protected virtual void Subscribe(FastColoredTextBox target)
         {
-            target.Scroll += new ScrollEventHandler(Target_Scroll);
-            target.SelectionChangedDelayed += new EventHandler(Target_SelectionChanged);
-            target.VisibleRangeChanged += new EventHandler(Target_VisibleRangeChanged);
+            target.Scroll += Target_Scroll;
+            target.SelectionChangedDelayed += Target_SelectionChanged;
+            target.VisibleRangeChanged += Target_VisibleRangeChanged;
         }
 
         protected virtual void Target_VisibleRangeChanged(object sender, EventArgs e)
@@ -128,62 +127,62 @@ namespace FastColoredTextBoxNS
 
         public void NeedRepaint()
         {
-            needRepaint = true;
+            _needRepaint = true;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (target == null)
+            if (_target == null)
                 return;
 
-            var zoom = this.Scale * 100 / target.Zoom;
+            var zoom = Scale*100/_target.Zoom;
 
             if (zoom <= float.Epsilon)
                 return;
 
             //calc startPlace
-            var r = target.VisibleRange;
-            if (startPlace.iLine > r.Start.iLine)
-                startPlace.iLine = r.Start.iLine;
+            var r = _target.VisibleRange;
+            if (_startPlace.ILine > r.Start.ILine)
+                _startPlace.ILine = r.Start.ILine;
             else
             {
-                var endP = target.PlaceToPoint(r.End);
-                endP.Offset(0, -(int)(ClientSize.Height / zoom) + target.CharHeight);
-                var pp = target.PointToPlace(endP);
-                if (pp.iLine > startPlace.iLine)
-                    startPlace.iLine = pp.iLine;
+                var endP = _target.PlaceToPoint(r.End);
+                endP.Offset(0, -(int) (ClientSize.Height/zoom) + _target.CharHeight);
+                var pp = _target.PointToPlace(endP);
+                if (pp.ILine > _startPlace.ILine)
+                    _startPlace.ILine = pp.ILine;
             }
-            startPlace.iChar = 0;
+            _startPlace.IChar = 0;
             //calc scroll pos
-            var linesCount = target.Lines.Count;
-            var sp1 = (float)r.Start.iLine / linesCount;
-            var sp2 = (float)r.End.iLine / linesCount;
+            var linesCount = _target.Lines.Count;
+            var sp1 = (float) r.Start.ILine/linesCount;
+            var sp2 = (float) r.End.ILine/linesCount;
 
             //scale graphics
             e.Graphics.ScaleTransform(zoom, zoom);
             //draw text
-            var size = new SizeF(ClientSize.Width / zoom, ClientSize.Height / zoom);
-            target.DrawText(e.Graphics, startPlace, size.ToSize());
+            var size = new SizeF(ClientSize.Width/zoom, ClientSize.Height/zoom);
+            _target.DrawText(e.Graphics, _startPlace, size.ToSize());
 
             //draw visible rect
-            var p0 = target.PlaceToPoint(startPlace);
-            var p1 = target.PlaceToPoint(r.Start);
-            var p2 = target.PlaceToPoint(r.End);
+            var p0 = _target.PlaceToPoint(_startPlace);
+            var p1 = _target.PlaceToPoint(r.Start);
+            var p2 = _target.PlaceToPoint(r.End);
             var y1 = p1.Y - p0.Y;
-            var y2 = p2.Y + target.CharHeight - p0.Y;
+            var y2 = p2.Y + _target.CharHeight - p0.Y;
 
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
             using (var brush = new SolidBrush(Color.FromArgb(50, ForeColor)))
-            using (var pen = new Pen(brush, 1 / zoom))
+            using (var pen = new Pen(brush, 1/zoom))
             {
-                var rect = new Rectangle(0, y1, (int)((ClientSize.Width - 1) / zoom), y2 - y1);
+                var rect = new Rectangle(0, y1, (int) ((ClientSize.Width - 1)/zoom), y2 - y1);
                 e.Graphics.FillRectangle(brush, rect);
                 e.Graphics.DrawRectangle(pen, rect);
             }
 
             //draw scrollbar
-            if (scrollbarVisible)
+            if (_scrollbarVisible)
             {
                 e.Graphics.ResetTransform();
                 e.Graphics.SmoothingMode = SmoothingMode.None;
@@ -191,49 +190,49 @@ namespace FastColoredTextBoxNS
                 using (var brush = new SolidBrush(Color.FromArgb(200, ForeColor)))
                 {
                     var rect = new RectangleF(ClientSize.Width - 3, ClientSize.Height*sp1, 2,
-                                              ClientSize.Height*(sp2 - sp1));
+                        ClientSize.Height*(sp2 - sp1));
                     e.Graphics.FillRectangle(brush, rect);
                 }
             }
 
-            needRepaint = false;
+            _needRepaint = false;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
                 Scroll(e.Location);
             base.OnMouseDown(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
                 Scroll(e.Location);
             base.OnMouseMove(e);
         }
 
         private void Scroll(Point point)
         {
-            if (target == null)
+            if (_target == null)
                 return;
 
-            var zoom = this.Scale*100/target.Zoom;
+            var zoom = Scale*100/_target.Zoom;
 
             if (zoom <= float.Epsilon)
                 return;
 
-            var p0 = target.PlaceToPoint(startPlace);
+            var p0 = _target.PlaceToPoint(_startPlace);
             p0 = new Point(0, p0.Y + (int) (point.Y/zoom));
-            var pp = target.PointToPlace(p0);
-            target.DoRangeVisible(new Range(target, pp, pp), true);
-            BeginInvoke((MethodInvoker)OnScroll);
+            var pp = _target.PointToPlace(p0);
+            _target.DoRangeVisible(new Range(_target, pp, pp), true);
+            BeginInvoke((MethodInvoker) OnScroll);
         }
 
         private void OnScroll()
         {
             Refresh();
-            target.Refresh();
+            _target.Refresh();
         }
 
         protected override void Dispose(bool disposing)
@@ -241,8 +240,8 @@ namespace FastColoredTextBoxNS
             if (disposing)
             {
                 Application.Idle -= Application_Idle;
-                if (target != null)
-                    UnSubscribe(target);
+                if (_target != null)
+                    UnSubscribe(_target);
             }
             base.Dispose(disposing);
         }
