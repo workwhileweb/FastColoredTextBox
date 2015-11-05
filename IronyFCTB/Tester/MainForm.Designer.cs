@@ -1,4 +1,4 @@
-﻿namespace Tester
+﻿namespace TesterIrony
 {
     partial class MainForm
     {

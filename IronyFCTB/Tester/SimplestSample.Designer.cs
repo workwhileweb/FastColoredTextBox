@@ -1,4 +1,6 @@
-﻿namespace Tester
+﻿using FastColoredTextBox;
+
+namespace TesterIrony
 {
     partial class SimplestSample
     {
@@ -42,7 +44,7 @@
             this.schemeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sQLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wikiCodeplexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ironyFCTB = new FastColoredTextBoxNS.IronyFCTB();
+            this.ironyFCTB = new IronyFctb();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ironyFCTB)).BeginInit();
             this.SuspendLayout();
@@ -79,70 +81,70 @@
             this.cSharpToolStripMenuItem.Name = "cSharpToolStripMenuItem";
             this.cSharpToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.cSharpToolStripMenuItem.Text = "CSharp";
-            this.cSharpToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.cSharpToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // jsonToolStripMenuItem
             // 
             this.jsonToolStripMenuItem.Name = "jsonToolStripMenuItem";
             this.jsonToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.jsonToolStripMenuItem.Text = "Json";
-            this.jsonToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.jsonToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // csvToolStripMenuItem
             // 
             this.csvToolStripMenuItem.Name = "csvToolStripMenuItem";
             this.csvToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.csvToolStripMenuItem.Text = "Csv";
-            this.csvToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.csvToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // gwBasicToolStripMenuItem
             // 
             this.gwBasicToolStripMenuItem.Name = "gwBasicToolStripMenuItem";
             this.gwBasicToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.gwBasicToolStripMenuItem.Text = "GwBasic";
-            this.gwBasicToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.gwBasicToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // javaToolStripMenuItem
             // 
             this.javaToolStripMenuItem.Name = "javaToolStripMenuItem";
             this.javaToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.javaToolStripMenuItem.Text = "Java";
-            this.javaToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.javaToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // miniPythonToolStripMenuItem
             // 
             this.miniPythonToolStripMenuItem.Name = "miniPythonToolStripMenuItem";
             this.miniPythonToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.miniPythonToolStripMenuItem.Text = "MiniPython";
-            this.miniPythonToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.miniPythonToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // myCToolStripMenuItem
             // 
             this.myCToolStripMenuItem.Name = "myCToolStripMenuItem";
             this.myCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.myCToolStripMenuItem.Text = "My C";
-            this.myCToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.myCToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // schemeToolStripMenuItem
             // 
             this.schemeToolStripMenuItem.Name = "schemeToolStripMenuItem";
             this.schemeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.schemeToolStripMenuItem.Text = "Scheme";
-            this.schemeToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.schemeToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // sQLToolStripMenuItem
             // 
             this.sQLToolStripMenuItem.Name = "sQLToolStripMenuItem";
             this.sQLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.sQLToolStripMenuItem.Text = "SQL";
-            this.sQLToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.sQLToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // wikiCodeplexToolStripMenuItem
             // 
             this.wikiCodeplexToolStripMenuItem.Name = "wikiCodeplexToolStripMenuItem";
             this.wikiCodeplexToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.wikiCodeplexToolStripMenuItem.Text = "Wiki-Codeplex";
-            this.wikiCodeplexToolStripMenuItem.Click += new System.EventHandler(this.miClick);
+            this.wikiCodeplexToolStripMenuItem.Click += new System.EventHandler(this.MiClick);
             // 
             // ironyFCTB
             // 
@@ -196,6 +198,6 @@
         private System.Windows.Forms.ToolStripMenuItem schemeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sQLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem wikiCodeplexToolStripMenuItem;
-        private FastColoredTextBoxNS.IronyFCTB ironyFCTB;
+        private IronyFctb ironyFCTB;
     }
 }

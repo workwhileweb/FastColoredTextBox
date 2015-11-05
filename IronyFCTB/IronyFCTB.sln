@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronyFCTB", "IronyFCTB\IronyFCTB.csproj", "{6EECD3A9-1707-4F50-81E4-073E4735092E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tester", "Tester\Tester.csproj", "{43D2D475-95C2-4E15-B1B2-4611FEC57F7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesterIrony", "Tester\TesterIrony.csproj", "{43D2D475-95C2-4E15-B1B2-4611FEC57F7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

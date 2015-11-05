@@ -14,26 +14,26 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using FastColoredTextBoxNS;
 using Irony.Parsing;
 
-namespace FastColoredTextBoxNS
+namespace FastColoredTextBox
 {
     /// <summary>
-    /// FastColoredTextBox with Irony parser support
+    ///     FastColoredTextBox with Irony parser support
     /// </summary>
-    /// <see cref="https://github.com/PavelTorgashov/FastColoredTextBox"/>
-    /// <see cref="http://irony.codeplex.com/"/>
-    public class IronyFCTB : FastColoredTextBox
+    /// <see cref="https://github.com/PavelTorgashov/FastColoredTextBox" />
+    /// <see cref="http://irony.codeplex.com/" />
+    public class IronyFctb : FastColoredTextBoxNS.FastColoredTextBox
     {
-        public event EventHandler<StyleNeededEventArgs> StyleNeeded;
-
         protected Parser parser;
         public Style WavyStyle = new WavyLineStyle(255, Color.Red);
 
         /// <summary>
-        /// Grammar of custom language
+        ///     Grammar of custom language
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
+         EditorBrowsable(EditorBrowsableState.Never)]
         public Grammar Grammar
         {
             get
@@ -42,34 +42,24 @@ namespace FastColoredTextBoxNS
                     return parser.Language.Grammar;
                 return null;
             }
-            set 
-            {
-                SetParser(value);
-            }
+            set { SetParser(value); }
         }
 
         /// <summary>
-        /// Parser of custom language
+        ///     Parser of custom language
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
+         EditorBrowsable(EditorBrowsableState.Never)]
         public Parser Parser
         {
-            get
-            {
-                return parser;
-            }
-            set
-            {
-                SetParser(value);
-            }
+            get { return parser; }
+            set { SetParser(value); }
         }
 
-        public IronyFCTB()
-        {
-        }
+        public event EventHandler<StyleNeededEventArgs> StyleNeeded;
 
         /// <summary>
-        /// Sets Irony parser (based on Grammar)
+        ///     Sets Irony parser (based on Grammar)
         /// </summary>
         public virtual void SetParser(Grammar grammar)
         {
@@ -77,7 +67,7 @@ namespace FastColoredTextBoxNS
         }
 
         /// <summary>
-        /// Sets Irony parser (based on LanguageData)
+        ///     Sets Irony parser (based on LanguageData)
         /// </summary>
         public virtual void SetParser(LanguageData language)
         {
@@ -85,7 +75,7 @@ namespace FastColoredTextBoxNS
         }
 
         /// <summary>
-        /// Sets Irony parser
+        ///     Sets Irony parser
         /// </summary>
         public virtual void SetParser(Parser parser)
         {
@@ -105,7 +95,7 @@ namespace FastColoredTextBoxNS
 
         protected virtual void DoHighlighting()
         {
-            if(parser == null)
+            if (parser == null)
                 return;
 
             //parse text
@@ -124,7 +114,7 @@ namespace FastColoredTextBoxNS
             //highlight errors
             if (tree.Status == ParseTreeStatus.Error)
             {
-                ClearStyle(GetStyleIndexMask(new Style[] {WavyStyle}));
+                ClearStyle(GetStyleIndexMask(new[] {WavyStyle}));
                 foreach (var msg in tree.ParserMessages)
                 {
                     var loc = msg.Location;
@@ -146,7 +136,7 @@ namespace FastColoredTextBoxNS
                 if (arg.Cancel)
                     continue;
 
-                if(arg.Style != null)
+                if (arg.Style != null)
                 {
                     GetTokenRange(t).SetStyle(arg.Style);
                     continue;
@@ -178,7 +168,7 @@ namespace FastColoredTextBoxNS
         }
 
         /// <summary>
-        /// Returns range of token
+        ///     Returns range of token
         /// </summary>
         public Range GetTokenRange(Token t)
         {
@@ -203,24 +193,24 @@ namespace FastColoredTextBoxNS
 
             // select the first two pair of braces with the length of exactly one char (FCTB restrictions)
             var braces = parser.Language.Grammar.KeyTerms
-              .Select(pair => pair.Value)
-              .Where(term => term.Flags.IsSet(TermFlags.IsOpenBrace))
-              .Where(term => term.IsPairFor != null && term.IsPairFor is KeyTerm)
-              .Where(term => term.Text.Length == 1)
-              .Where(term => ((KeyTerm)term.IsPairFor).Text.Length == 1)
-              .Take(2);
+                .Select(pair => pair.Value)
+                .Where(term => term.Flags.IsSet(TermFlags.IsOpenBrace))
+                .Where(term => term.IsPairFor != null && term.IsPairFor is KeyTerm)
+                .Where(term => term.Text.Length == 1)
+                .Where(term => ((KeyTerm) term.IsPairFor).Text.Length == 1)
+                .Take(2);
             if (braces.Any())
             {
                 // first pair
                 var brace = braces.First();
                 LeftBracket = brace.Text.First();
-                RightBracket = ((KeyTerm)brace.IsPairFor).Text.First();
+                RightBracket = ((KeyTerm) brace.IsPairFor).Text.First();
                 // second pair
                 if (braces.Count() > 1)
                 {
                     brace = braces.Last();
                     LeftBracket2 = brace.Text.First();
-                    RightBracket2 = ((KeyTerm)brace.IsPairFor).Text.First();
+                    RightBracket2 = ((KeyTerm) brace.IsPairFor).Text.First();
                 }
             }
             else
@@ -234,12 +224,13 @@ namespace FastColoredTextBoxNS
     public class StyleNeededEventArgs : EventArgs
     {
         public readonly Token Token;
-        public bool Cancel { get; set; }
-        public Style Style { get; set; }
 
         public StyleNeededEventArgs(Token t)
         {
             Token = t;
         }
+
+        public bool Cancel { get; set; }
+        public Style Style { get; set; }
     }
 }

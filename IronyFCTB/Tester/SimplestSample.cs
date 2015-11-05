@@ -6,10 +6,10 @@ using Irony.Samples.CSharp;
 using Irony.Samples.Java;
 using Irony.Samples.Json;
 using Irony.Samples.MiniPython;
-using Irony.Samples.SQL;
 using Irony.Samples.Scheme;
+using Irony.Samples.SQL;
 
-namespace Tester
+namespace TesterIrony
 {
     public partial class SimplestSample : Form
     {
@@ -19,22 +19,42 @@ namespace Tester
             cSharpToolStripMenuItem.PerformClick();
         }
 
-        private void miClick(object sender, EventArgs e)
+        private void MiClick(object sender, EventArgs e)
         {
             var langName = sender.ToString();
             miLanguage.Text = langName;
-            switch(langName)
+            switch (langName)
             {
-                case "CSharp": ironyFCTB.Grammar = new CSharpGrammar(); break;
-                case "Json": ironyFCTB.Grammar = new JsonGrammar(); break;
-                case "Csv": ironyFCTB.Grammar = new SampleCsvGrammar(); break;
-                case "GwBasic": ironyFCTB.Grammar = new GWBasicGrammar(); break;
-                case "Java": ironyFCTB.Grammar = new JavaGrammar(); break;
-                case "MiniPython": ironyFCTB.Grammar = new MiniPythonGrammar(); break;
-                case "My C": ironyFCTB.Grammar = new MyCGrammar(); break;
-                case "Scheme": ironyFCTB.Grammar = new SchemeGrammar(); break;
-                case "SQL": ironyFCTB.Grammar = new SqlGrammar(); break;
-                case "Wiki-Codeplex": ironyFCTB.Grammar = new WikiCodeplexGrammar(); break;
+                case "CSharp":
+                    ironyFCTB.Grammar = new CSharpGrammar();
+                    break;
+                case "Json":
+                    ironyFCTB.Grammar = new JsonGrammar();
+                    break;
+                case "Csv":
+                    ironyFCTB.Grammar = new SampleCsvGrammar();
+                    break;
+                case "GwBasic":
+                    ironyFCTB.Grammar = new GWBasicGrammar();
+                    break;
+                case "Java":
+                    ironyFCTB.Grammar = new JavaGrammar();
+                    break;
+                case "MiniPython":
+                    ironyFCTB.Grammar = new MiniPythonGrammar();
+                    break;
+                case "My C":
+                    ironyFCTB.Grammar = new MyCGrammar();
+                    break;
+                case "Scheme":
+                    ironyFCTB.Grammar = new SchemeGrammar();
+                    break;
+                case "SQL":
+                    ironyFCTB.Grammar = new SqlGrammar();
+                    break;
+                case "Wiki-Codeplex":
+                    ironyFCTB.Grammar = new WikiCodeplexGrammar();
+                    break;
             }
         }
     }
